@@ -1,0 +1,15 @@
+../desing/defines.svh
+../desing/crc.sv
+../desing/deser.sv
+../desing/ef_utils.v
+../desing/fec.sv
+../desing/fec_fsm.sv
+../desing/reg_cfg.sv
+../desing/rf_pkt.sv
+../desing/training.sv
+../desing/uart.sv
+../desing/dl_fec.sv
+../desing/dl_ctrl.sv
+../desing/fec_top.sv
+../testbench/tb_macros.sv
+../testbench/testbench.sv

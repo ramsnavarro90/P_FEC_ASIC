@@ -1,0 +1,95 @@
+onerror {resume}
+quietly WaveActivateNextPane {} 0
+add wave -noupdate -expand -group FEC_Top -label clk /fec_top_tb/clk
+add wave -noupdate -expand -group FEC_Top -label rst_n /fec_top_tb/rst_n
+add wave -noupdate -expand -group FEC_Top -label uart_tx /fec_top_tb/uart_tx
+add wave -noupdate -expand -group FEC_Top -label uart_rx /fec_top_tb/uart_rx
+add wave -noupdate -expand -group FEC_Top -label dl_out /fec_top_tb/dl_out
+add wave -noupdate -expand -group FEC_Top -label dl_en /fec_top_tb/dl_en
+add wave -noupdate -expand -group FEC_Top -label dl_ready /fec_top_tb/dl_ready
+add wave -noupdate -expand -group FEC_Top -label ul_in /fec_top_tb/ul_in
+add wave -noupdate -expand -group FEC_Top -label ul_en /fec_top_tb/ul_en
+add wave -noupdate -group APB -label pclk /fec_top_tb/fec_u/reg_cfg_u/pclk
+add wave -noupdate -group APB -label presetn /fec_top_tb/fec_u/reg_cfg_u/presetn
+add wave -noupdate -group APB -label psel /fec_top_tb/fec_u/reg_cfg_u/psel
+add wave -noupdate -group APB -label penable /fec_top_tb/fec_u/reg_cfg_u/penable
+add wave -noupdate -group APB -label pwrite /fec_top_tb/fec_u/reg_cfg_u/pwrite
+add wave -noupdate -group APB -label paddr /fec_top_tb/fec_u/reg_cfg_u/paddr
+add wave -noupdate -group APB -label pwdata /fec_top_tb/fec_u/reg_cfg_u/pwdata
+add wave -noupdate -group APB -label prdata /fec_top_tb/fec_u/reg_cfg_u/prdata
+add wave -noupdate -group APB -label pslverr /fec_top_tb/fec_u/reg_cfg_u/pslverr
+add wave -noupdate -group Registers -label DL_SER_CLK_DIV /fec_top_tb/fec_u/reg_cfg_u/DL_SER_CLK_DIV
+add wave -noupdate -group Registers -label DL_ERR_INJ_MASK_0 /fec_top_tb/fec_u/reg_cfg_u/DL_ERR_INJ_MASK_0
+add wave -noupdate -group Registers -label DL_ERR_INJ_MASK_1 /fec_top_tb/fec_u/reg_cfg_u/DL_ERR_INJ_MASK_1
+add wave -noupdate -group Registers -label DL_ERR_INJ_ENABLE /fec_top_tb/fec_u/reg_cfg_u/DL_ERR_INJ_ENABLE
+add wave -noupdate -group Registers -label DL_ERR_INJ_ENABLE_CLEAR /fec_top_tb/fec_u/reg_cfg_u/DL_ERR_INJ_ENABLE_CLEAR
+add wave -noupdate -group Registers -label UART_PR /fec_top_tb/fec_u/reg_cfg_u/UART_PR
+add wave -noupdate -group Registers -label UART_CTRL /fec_top_tb/fec_u/reg_cfg_u/UART_CTRL
+add wave -noupdate -group Registers -label UART_CFG /fec_top_tb/fec_u/reg_cfg_u/UART_CFG
+add wave -noupdate -group FEC_FSM -label uart_rx_array /fec_top_tb/fec_u/u_fec_fsm/uart_rx_array
+add wave -noupdate -group FEC_FSM -label uart_rx_array_0 /fec_top_tb/fec_u/u_fec_fsm/uart_rx_array_0
+add wave -noupdate -group FEC_FSM -label uart_rx_level /fec_top_tb/fec_u/u_fec_fsm/uart_rx_level
+add wave -noupdate -group FEC_FSM -label uart_rx_done /fec_top_tb/fec_u/u_fec_fsm/uart_rx_done
+add wave -noupdate -group FEC_FSM -label uart_rx_fifo_flush /fec_top_tb/fec_u/u_fec_fsm/uart_rx_fifo_flush
+add wave -noupdate -group FEC_FSM -label uart_rx_fifo_reg /fec_top_tb/fec_u/u_fec_fsm/uart_rx_fifo_reg
+add wave -noupdate -group FEC_FSM -label uart_tx_level /fec_top_tb/fec_u/u_fec_fsm/uart_tx_level
+add wave -noupdate -group FEC_FSM -label dl_fec_crc1_start /fec_top_tb/fec_u/u_fec_fsm/dl_fec_crc1_start
+add wave -noupdate -group FEC_FSM -label dl_fec_enc1_done /fec_top_tb/fec_u/u_fec_fsm/dl_fec_enc1_done
+add wave -noupdate -group FEC_FSM -label dl_fec_crc0_start /fec_top_tb/fec_u/u_fec_fsm/dl_fec_crc0_start
+add wave -noupdate -group FEC_FSM -label dl_fec_enc0_done /fec_top_tb/fec_u/u_fec_fsm/dl_fec_enc0_done
+add wave -noupdate -group FEC_FSM -label dl_ctrl_start /fec_top_tb/fec_u/u_fec_fsm/dl_ctrl_start
+add wave -noupdate -group FEC_FSM -label dl_ctrl_ser_en /fec_top_tb/fec_u/u_fec_fsm/dl_ctrl_ser_en
+add wave -noupdate -group FEC_FSM -label dl_ctrl_enc_used /fec_top_tb/fec_u/u_fec_fsm/dl_ctrl_enc_used
+add wave -noupdate -group FEC_FSM -label state /fec_top_tb/fec_u/u_fec_fsm/state
+add wave -noupdate -group FEC_FSM -label next_state /fec_top_tb/fec_u/u_fec_fsm/next_state
+add wave -noupdate -group FEC_FSM -label dl_cmd /fec_top_tb/fec_u/u_fec_fsm/dl_cmd
+add wave -noupdate -group FEC_FSM -label dl_msg_len /fec_top_tb/fec_u/u_fec_fsm/dl_msg_len
+add wave -noupdate -group FEC_FSM -label dl_msg_tag /fec_top_tb/fec_u/u_fec_fsm/dl_msg_tag
+add wave -noupdate -group FEC_FSM -label dl_msg_cnt /fec_top_tb/fec_u/u_fec_fsm/dl_msg_cnt
+add wave -noupdate -group FEC_FSM -label dl_reg_addr /fec_top_tb/fec_u/u_fec_fsm/dl_reg_addr
+add wave -noupdate -group FEC_FSM -label dl_reg_rdata /fec_top_tb/fec_u/u_fec_fsm/dl_reg_rdata
+add wave -noupdate -group FEC_FSM -label dl_txn_done /fec_top_tb/fec_u/u_fec_fsm/dl_txn_done
+add wave -noupdate -group FEC_FSM -label dl_ready /fec_top_tb/fec_u/u_fec_fsm/dl_ready
+add wave -noupdate -group FEC_FSM -label dl_cmd_error /fec_top_tb/fec_u/u_fec_fsm/dl_cmd_error
+add wave -noupdate -group FEC_FSM -label uart_fatal_errors /fec_top_tb/fec_u/u_fec_fsm/uart_fatal_errors
+add wave -noupdate -group FEC_FSM -label dl_uart_tx_wr /fec_top_tb/fec_u/u_fec_fsm/dl_uart_tx_wr
+add wave -noupdate -group FEC_FSM -label dl_uart_tx_wdata /fec_top_tb/fec_u/u_fec_fsm/dl_uart_tx_wdata
+add wave -noupdate -group FEC_FSM -label dl_uart_tx_grant /fec_top_tb/fec_u/u_fec_fsm/dl_uart_tx_grant
+add wave -noupdate -group FEC_FSM -label dl_uart_tx_req /fec_top_tb/fec_u/u_fec_fsm/dl_uart_tx_req
+add wave -noupdate -expand -group DL_CTRL -label dl_state /fec_top_tb/fec_u/dl_ctrl_u/dl_state
+add wave -noupdate -expand -group DL_CTRL -label next_dl_state /fec_top_tb/fec_u/dl_ctrl_u/next_dl_state
+add wave -noupdate -expand -group DL_CTRL -label training_out /fec_top_tb/fec_u/dl_ctrl_u/training_out
+add wave -noupdate -expand -group DL_CTRL -label training_start /fec_top_tb/fec_u/dl_ctrl_u/training_start
+add wave -noupdate -expand -group DL_CTRL -label training_done /fec_top_tb/fec_u/dl_ctrl_u/training_done
+add wave -noupdate -expand -group DL_CTRL -label state /fec_top_tb/fec_u/dl_ctrl_u/training_u/state
+add wave -noupdate -expand -group DL_CTRL -label bit_count /fec_top_tb/fec_u/dl_ctrl_u/training_u/bit_count
+add wave -noupdate -expand -group DL_CTRL -label serial_out /fec_top_tb/fec_u/dl_ctrl_u/serial_out
+add wave -noupdate -expand -group DL_CTRL -label serial_start /fec_top_tb/fec_u/dl_ctrl_u/serial_start
+add wave -noupdate -expand -group DL_CTRL -label serial_done /fec_top_tb/fec_u/dl_ctrl_u/serial_done
+add wave -noupdate -expand -group DL_CTRL -label bit_count /fec_top_tb/fec_u/dl_ctrl_u/dl_ser_u/bit_count
+add wave -noupdate -expand -group DL_CTRL -label sample_count /fec_top_tb/fec_u/dl_ctrl_u/dl_ser_u/sample_count
+add wave -noupdate -expand -group DL_CTRL -label enc_used_r /fec_top_tb/fec_u/dl_ctrl_u/enc_used_r
+add wave -noupdate -expand -group DL_CTRL -label serial_width /fec_top_tb/fec_u/dl_ctrl_u/serial_width
+add wave -noupdate -expand -group DL_CTRL -label serial_depth /fec_top_tb/fec_u/dl_ctrl_u/serial_depth
+add wave -noupdate -label clk_div /fec_top_tb/fec_u/dl_ctrl_u/dl_ser_u/clk_div
+add wave -noupdate -label clk_div /fec_top_tb/fec_u/dl_ctrl_u/dl_ser_u/clk_cnt
+add wave -noupdate -label clk_cnt /fec_top_tb/fec_u/dl_ctrl_u/training_u/clk_cnt
+add wave -noupdate -label clk_div /fec_top_tb/fec_u/dl_ctrl_u/training_u/clk_div
+TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {143755000 ps} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 193
+configure wave -valuecolwidth 100
+configure wave -justifyvalue left
+configure wave -signalnamewidth 0
+configure wave -snapdistance 10
+configure wave -datasetprefix 0
+configure wave -rowmargin 4
+configure wave -childrowmargin 2
+configure wave -gridoffset 0
+configure wave -gridperiod 1
+configure wave -griddelta 40
+configure wave -timeline 0
+configure wave -timelineunits ps
+update
+WaveRestoreZoom {140643712 ps} {144460621 ps}
