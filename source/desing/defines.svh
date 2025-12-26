@@ -34,8 +34,11 @@ package fec_pkg;
   parameter int                    ENC0_DATA_DEPTH        = 8;
   parameter int                    ENC0_PAR_DATA_WIDTH    = 10;
   parameter int                    ENC0_PAR_DATA_DEPTH    = 8;
+  parameter int                    ENC0_SERIAL_DATA_WIDTH = ENC0_PAR_DATA_WIDTH * (ENC0_DATA_DEPTH-1) + // Data
+                                                            ENC0_PAR_DATA_WIDTH + ENC0_DATA_DEPTH +     // Parity
+                                                            CRC0_WIDTH;                                 // CRC
   
-  //CRC-Encoder 1 Params
+  // CRC-Encoder 1 Params
   parameter int                    CRC1_DATA_WIDTH        = 12; // 12b data + 4b CRC = 16b
   parameter int                    CRC1_WIDTH             = 4;
   parameter logic [CRC1_WIDTH:0]   CRC1_POLY              = 'b10011;
@@ -45,7 +48,9 @@ package fec_pkg;
   parameter int                    ENC1_DATA_DEPTH        = 4;
   parameter int                    ENC1_PAR_DATA_WIDTH    = 6;
   parameter int                    ENC1_PAR_DATA_DEPTH    = 4;
-
+  parameter int                    ENC1_SERIAL_DATA_WIDTH = ENC1_PAR_DATA_WIDTH * (ENC1_DATA_DEPTH-1) + // Data
+                                                            ENC1_PAR_DATA_WIDTH + ENC1_DATA_DEPTH +     // Parity
+                                                            CRC1_WIDTH;                                 // CRC
   // Serializer
   parameter int                    SERIAL_CLK_DIV         = 7;
   parameter int                    SERIAL_DIV_WIDTH       = 16; // Serializer clock div width

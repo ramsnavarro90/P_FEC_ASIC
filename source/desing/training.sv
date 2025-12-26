@@ -1,5 +1,5 @@
 module training_preamble #(
-  parameter int PREAMBLE_COUNT = 7,
+  parameter int PREAMBLE_COUNT = 8,
   parameter int DIV_WIDTH = 8
 )(
   input logic clk,
@@ -29,19 +29,6 @@ module training_preamble #(
  // if((PREAMBLE_COUNT == 0) || ((PREAMBLE_COUNT & (PREAMBLE_COUNT - 1)) != 0)) begin
  //   $error("trainee_preamble: PREAMBLE_COUNT (%0d) must be a power of 2!", PREAMBLE_COUNT);
  // end
-
-  // FSM - Sequential state update
-  // always_ff @(posedge clk or negedge rst_n) begin
-  //   if (!rst_n)
-  //     state <= S_IDLE;
-  //   else begin
-  //     case (state)
-  //       S_IDLE:      state <= (start) ? S_TRAINING : S_IDLE;
-  //       S_TRAINING:  state <= (done)  ? S_IDLE : S_TRAINING;
-  //       default:     state <= S_IDLE;
-  //     endcase
-  //   end
-  // end
 
   // Calculate done signal combinationally
   assign done = (state == S_TRAINING) && (bit_count == PREAMBLE_COUNT_INT) && (clk_cnt == clk_div);
@@ -103,6 +90,7 @@ endmodule
 
 
 module training_detector #(
+  parameter int PREAMBLE_COUNT = 8,
   parameter int DIV_WIDTH = 8
 )(
   input  logic clk,
@@ -110,7 +98,8 @@ module training_detector #(
   output logic [DIV_WIDTH-1:0] clk_div,
   input  logic start,
   output logic done,
-  input  logic training
+  input  logic training,
+  input  logic enable
 );
 
   typedef enum logic {
@@ -119,11 +108,81 @@ module training_detector #(
   } state_t;
   state_t state;
 
-  //logic [$clog2(PREAMBLE_COUNT):0] bit_count;
-  logic done_int;
-  logic [4:0] bit_count;
+  logic training_prev, training_negedge;
+  logic [$clog2(PREAMBLE_COUNT):0] training_negedge_count;
   logic [DIV_WIDTH-1:0] clk_cnt;
   
+  // FSM - Sequential state update
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n)
+      state <= S_IDLE;
+    else begin
+      case (state)
+        S_IDLE:      state <= (start) ? S_TRAINING : S_IDLE;
+        S_TRAINING:  state <= (done)  ? S_IDLE : S_TRAINING;
+        default:     state <= S_IDLE;
+      endcase
+    end
+  end
+
+  // Calculate done signal combinationally
+
+  assign done = (state == S_TRAINING) && (training_negedge_count == PREAMBLE_COUNT);
   
+
+  // Training posedge detection
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      training_prev <= 1'b0;
+    end
+    else begin
+      training_prev <= training;
+    end
+  end
+
+  assign training_negedge = ~training & training_prev;
+
+  // Training negedge counter
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      training_negedge_count <= 'b0;
+    end
+    else begin
+      if (state == S_TRAINING) begin
+        if (training_negedge == 1'b1 && enable == 1'b1)
+          training_negedge_count <= training_negedge_count + 1'b1;
+        else
+          training_negedge_count <= training_negedge_count;
+      end
+      else // S_IDLE
+        training_negedge_count <= 'b0;
+    end 
+  end
+
+  // Clock counter
+
+  always_ff @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+      clk_cnt <= 'b0;
+      clk_div <= 'b0;
+    end
+    else begin     
+      if (state == S_TRAINING) begin
+        if (enable == 1'b1 && training == 1'b1)
+          clk_cnt <= clk_cnt + 1'b1;
+        else if (done == 1'b1)
+          clk_div <= clk_cnt >> $clog2(PREAMBLE_COUNT); // Average clock count per bit
+        else
+          clk_cnt <= clk_cnt;
+      end
+      else begin // S_IDLE
+        clk_cnt <= 'b0;
+        clk_div <= 'b0;
+      end
+    end
+  end
 
  endmodule

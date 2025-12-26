@@ -52,7 +52,7 @@ module dl_controller #(
   // Auto-clear signal for err inj
   assign err_inj_enable_clear = ~enc_used_r & serial_done;
   
-   // Current state
+  // Current state
   always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n)
       dl_state <= S_IDLE;
@@ -103,7 +103,7 @@ module dl_controller #(
   end
     
    // Output logic
-  always @(posedge clk or negedge rst_n) begin
+  always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
       training_start  <= 'b0;
       serial_start    <= 'b0;

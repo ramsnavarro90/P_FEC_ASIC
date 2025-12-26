@@ -78,9 +78,9 @@ module serializer #(
          //if (clk_cnt == (clk_div-'b1)) begin
           if (clk_cnt == (clk_div)) begin  
             clk_cnt <= 0;
-//             $display("[%0t] par_in: %0b", $time, par_in);
-//             $display("[%0t] par_in_r: %0b", $time, par_in_r);
-//             $display("[%0t] serial_out: %0b sample_count: %0d bit_count: %0d", $time, serial_out, sample_count, bit_count);
+            // $display("[%0t] par_in: %0b", $time, par_in);
+            // $display("[%0t] par_in_r: %0b", $time, par_in_r);
+            // $display("[%0t] serial_out: %0b sample_count: %0d bit_count: %0d", $time, serial_out, sample_count, bit_count);
 
           //if (bit_count == (DATA_WIDTH-1)) begin
           //if (bit_count >= (width_r-1'b1)) begin
@@ -112,7 +112,8 @@ endmodule
 
 module deserializer #(
   parameter integer DATA_WIDTH = 32,
-  parameter integer DATA_DEPTH = 4
+  parameter integer DATA_DEPTH = 4,
+  parameter integer DIV_WIDTH  = 8
 )(
   input  logic                                  clk,
   input  logic                                  rst_n,

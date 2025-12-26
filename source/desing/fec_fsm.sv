@@ -1,5 +1,6 @@
 import fec_pkg::*;
 
+// Downlink FEC FSM
 module fec_fsm(
   input  logic                clk,
   input  logic                rst_n,
@@ -112,9 +113,7 @@ module fec_fsm(
   assign uart_rx_array_0  = uart_rx_array[0];
   
   assign dl_ready = (uart_rx_level < 'd7);
-    
-    
-      
+  
   // Current state logic
   always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n)
@@ -719,11 +718,24 @@ module fec_fsm(
     end
        
   end
-  
-  
+
 endmodule
 
-module up_fec_fsm();
-  
+// Uplink FEC FSM
+module up_fec_fsm(
+  input  logic                clk,
+  input  logic                rst_n
+);
+
+typedef enum logic [2:0] {
+    S_IDLE           = 'd0,
+
+    // FEC Message receive
+
+    S_MESSAGE_ID     = 'd1,
+    S_MESSAGE_DATA   = 'd2
+
+} state_fsm_ul_t;
+state_fsm_ul_t state, next_state;
 
 endmodule

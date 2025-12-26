@@ -349,6 +349,17 @@ module fec_top(
     .err_inj_enable       (dl_err_inj_enable),
     .err_inj_enable_clear (dl_err_inj_enable_clear)
    );
-    
   
+  // ========== UL FEC Engine =========
+
+  // ========= Uplink monitor =========
+  uplink_monitor  # (
+    .SERIAL_DIV_WIDTH   (SERIAL_DIV_WIDTH)
+  ) ul_mon_u (
+    .clk        (clk),
+    .rst_n      (rst_n),
+    .ul_in      (ul_in),
+    .ul_en      (ul_en)
+  );
+
 endmodule

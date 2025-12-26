@@ -47,6 +47,20 @@ module fec_top_tb;
     .ul_en    (ul_en)
   );
   
+  // Loopback mode selection
+  initial begin
+    if($test$plusargs("LOOPBACK")) begin
+      assign ul_in = dl_out;
+      assign ul_en = dl_en;
+      $display("[%0t][TB] FEC Loopback mode is ON ", $time);
+    end
+    else begin
+      assign ul_in = 1'b0;
+      assign ul_en = 1'b0;
+      $display("[%0t][TB] FEC Loopback mode is OFF ", $time);
+    end
+  end
+
   `TB_CLK(clk, 10)
   `TB_SRSTN(rst_n, clk, 1)
   `TB_DUMP("fec_top_tb.vcd", fec_top_tb, 0) 
@@ -78,7 +92,8 @@ module fec_top_tb;
        $display("[%0t][TB] No test is selected, finishing ", $time);
        $finish;
      end
-    
+
+         
     $monitor("[%0t][TB] fec_fsm.state: %s", $time, fec_u.u_fec_fsm.state.name());
     //downlink_monitor(/*clk, fec_u.dl_out*/);
     
