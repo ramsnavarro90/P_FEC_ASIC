@@ -6,21 +6,16 @@ import fec_pkg::*;
 module dl_fec_engine (
   input  logic clk,
   input  logic rst_n,
-//input  logic [UART_MDW-1:0] data_in [2**UART_FAW-2:0], // 8-bit vector x 7 items = 56
-//input  logic [UART_MDW-1:0] data_in [2**UART_FAW-1:0], // 8-bit vector x 7 items = 56
-  input  logic [2**UART_FAW-1:0][UART_MDW-1:0] data_in, // 8-bit vector x 7 items = 56
-//output logic [UART_MDW-1:0] data_out[2**UART_FAW-1:0], // 8-bit vector x 8 items = 64
-  
-  //input logic [3:0]          frm_type, // not needed for decoding/encoding
+  input  logic [2**UART_FAW-1:0][UART_MDW-1:0] data_in, // 8-bit vector x 7 items = 56 bits
   input logic [7:0]          msg_len,
   input logic [3:0]          msg_tag,
-  
+  // 64-bit Encoding cluster
   input  logic crc0_start,
   output logic enc0_done,
   output logic [CRC0_WIDTH-1:0]      crc0_data_out,
   output logic [ENC0_DATA_DEPTH-1:0] enc0_row_p,
   output logic [ENC0_DATA_WIDTH-1:0] enc0_col_p,
-  
+  // 16-bit Encoding cluster
   input  logic crc1_start,
   output logic enc1_done,
   output logic [CRC1_WIDTH-1:0]      crc1_data_out,
@@ -28,7 +23,7 @@ module dl_fec_engine (
   output logic [ENC1_DATA_WIDTH-1:0] enc1_col_p
   );
   
-  // CRC-8 + 64-bit Encoding
+  // CRC-8 + 64-bit Encoding cluster
   
   logic [CRC0_DATA_WIDTH-1:0] crc0_data_in;
   logic                       crc0_done;
@@ -47,7 +42,7 @@ module dl_fec_engine (
     .POLY               (CRC0_POLY),
     .SEED               (CRC0_SEED),
     .XOR_OPS_PER_CYCLE  (CRC0_XOR_OPS_PER_CYCLE)
-  ) u_crc_gen0 (
+  ) crc_gen0_u (
     .clk                (clk),
     .rst_n              (rst_n),
     .start              (crc0_start),
@@ -57,7 +52,7 @@ module dl_fec_engine (
   );
   
   logic [ENC0_DATA_WIDTH-1:0][ENC0_DATA_DEPTH-1:0] enc0_data_in;
-//assign enc0_data_in = '{crc0_data_out, // B7 CRC-8
+
   assign enc0_data_in =  {crc0_data_out, // B7 CRC-8
                           data_in[6][UART_MDW-1:0],    // B6 D6
                           data_in[5][UART_MDW-1:0],    // B5 D5
@@ -70,7 +65,7 @@ module dl_fec_engine (
   encoder #(
     .WIDTH              (ENC0_DATA_WIDTH),
     .DEPTH              (ENC0_DATA_DEPTH)
-  ) u_encoder0 (
+  ) encoder0_u (
     .clk                (clk),
     .rst_n              (rst_n),
     .data_in            (enc0_data_in),
@@ -81,16 +76,12 @@ module dl_fec_engine (
   );
   
   
-  // CRC-4 + 16-bit Encoding
+  // CRC-4 + 16-bit Encoding cluster
   
   logic [CRC1_DATA_WIDTH-1:0] crc1_data_in;
   logic                       crc1_done;
   
-//   assign crc1_data_in = '{data_in[1],
-//                          data_in[0]}; 
-  
-  assign crc1_data_in = {msg_len,
-                          msg_tag}; 
+  assign crc1_data_in = {msg_len, msg_tag}; 
   
   crc_generator_seq #(
     .DATA_WIDTH         (CRC1_DATA_WIDTH),
@@ -98,7 +89,7 @@ module dl_fec_engine (
     .POLY               (CRC1_POLY),
     .SEED               (CRC1_SEED),
     .XOR_OPS_PER_CYCLE  (CRC1_XOR_OPS_PER_CYCLE)
-  ) u_crc_gen1 (
+  ) crc_gen1_u (
     .clk                (clk),
     .rst_n              (rst_n),
     .start              (crc1_start),
@@ -108,10 +99,7 @@ module dl_fec_engine (
   );
   
   logic [ENC1_DATA_WIDTH-1:0][ENC1_DATA_DEPTH-1:0] enc1_data_in;
-//   assign enc1_data_in = {crc1_data_out,data_in[1][3:0], // B1 {CRC-4,d[3:0][1]]}
-//                           data_in[0]};                  // B0 D0
   
-//assign enc1_data_in = {crc1_data_out, frm_type, msg_len, msg_tag};
   assign enc1_data_in = {crc1_data_out, // 4-bit
                          msg_len,       // 8-bit
                          msg_tag};      // 4-bit
@@ -119,7 +107,7 @@ module dl_fec_engine (
   encoder #(
     .WIDTH              (ENC1_DATA_WIDTH),
     .DEPTH              (ENC1_DATA_DEPTH)
-  ) u_encoder1 (
+  ) encoder1_u (
     .clk                (clk),
     .rst_n              (rst_n),
     .data_in            (enc1_data_in),

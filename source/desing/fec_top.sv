@@ -11,20 +11,15 @@ import fec_pkg::*;
 //`include "reg_cfg.sv"
 
 module fec_top(
-  // System
-  input  logic   clk,
-  input  logic   rst_n,
-  // UART
-  input  logic  uart_rx,
+  input  logic  clk,      // System
+  input  logic  rst_n,
+  input  logic  uart_rx,  // UART
   output logic  uart_tx,
-  // Ready
-  output logic  dl_ready,
-  // Downlink
-  output logic  dl_out,
+  output logic  dl_ready, // DL Ready
+  output logic  dl_out,   // Downlink
   output logic  dl_en,
-  // Uplink
-  input logic   ul_in,
-  input logic   ul_en
+  input  logic  ul_in,    // Uplink
+  input  logic  ul_en
   );
   
   // Logic variables
@@ -120,7 +115,7 @@ module fec_top(
   assign uart_fatal_errors = {uart_frame_error_flag, uart_timeout_flag};
   
   // ====== FEC Control FSM  =======
-  fec_fsm u_fec_fsm (
+  fec_fsm fec_fsm_u (
     .clk                    (clk),
     .rst_n                  (rst_n),
     .ready                  (dl_ready),
@@ -294,7 +289,7 @@ module fec_top(
   
 
   // ========= DL FEC Engine =========
-  dl_fec_engine u_dl_fec (
+  dl_fec_engine dl_fec_u (
     .clk          (clk),
     .rst_n        (rst_n),
   //.data_in      (uart_rx_array_reg[0:2**UART_FAW-2]),
@@ -351,15 +346,27 @@ module fec_top(
    );
   
   // ========== UL FEC Engine =========
+  
+  logic       ul_fec_done;
+  logic [7:0] ul_fec_msg_len;
+  logic       ul_fec_uncor_err;
+  // Tie off signals for now
+  assign ul_fec_done       = 1'b1;
+  assign ul_fec_msg_len    = 8'd8;
+  assign ul_fec_uncor_err  = 1'b0;
 
   // ========= Uplink monitor =========
+
   uplink_monitor  # (
     .SERIAL_DIV_WIDTH   (SERIAL_DIV_WIDTH)
   ) ul_mon_u (
-    .clk        (clk),
-    .rst_n      (rst_n),
-    .ul_in      (ul_in),
-    .ul_en      (ul_en)
+    .clk              (clk),
+    .rst_n            (rst_n),
+    .ul_in            (ul_in),
+    .ul_en            (ul_en),
+    .ul_fec_done      (ul_fec_done),
+    .ul_fec_msg_len   (ul_fec_msg_len),
+    .ul_fec_uncor_err (ul_fec_uncor_err)
   );
 
 endmodule

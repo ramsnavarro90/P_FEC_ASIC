@@ -151,10 +151,10 @@ module dl_controller #(
     end
     
   end
-  
-  
- // Downlink output mux
-  always_comb begin :dl_mux
+    
+ // Output Mux
+
+  always_comb begin :output_mux_u
     //case(dl_state & next_dl_state)
     case(dl_state)
       S_IDLE: begin
@@ -180,7 +180,8 @@ module dl_controller #(
     endcase
   end
   
-  
+  // Training Preamble
+
   training_preamble #(
     .PREAMBLE_COUNT  (DL_PREAMBLE_COUNT),
     .DIV_WIDTH       (SERIAL_DIV_WIDTH)
@@ -197,7 +198,7 @@ module dl_controller #(
   logic [$clog2(ENC0_PAR_DATA_WIDTH):0] serial_width;
   logic [$clog2(ENC0_PAR_DATA_DEPTH):0] serial_depth;
   
-  always_comb begin
+  always_comb begin: serial_params_u
     if(enc_used_r) begin
       serial_width = (ENC1_PAR_DATA_WIDTH-1);
       serial_depth = (ENC1_PAR_DATA_DEPTH-1);
@@ -210,7 +211,9 @@ module dl_controller #(
   
   // Connect rf_packet_scramble and serializer
   logic [SERIAL_DATA_DEPTH-1:0][SERIAL_DATA_WIDTH-1:0] scrambled_data;
-    
+  
+  // Packet Scrambler
+
   rf_packet_scramble #(
     .DATA_WIDTH       (SERIAL_DATA_WIDTH),
     .DATA_DEPTH       (SERIAL_DATA_DEPTH)
@@ -231,6 +234,7 @@ module dl_controller #(
     .par_out        (scrambled_data)
   );
   
+  // Serializer
   serializer #(
     .DATA_WIDTH  (SERIAL_DATA_WIDTH),
     .DATA_DEPTH  (SERIAL_DATA_DEPTH),

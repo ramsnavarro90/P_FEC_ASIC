@@ -180,7 +180,7 @@ module training_detector #(
       end
       else begin // S_IDLE
         clk_cnt <= 'b0;
-        clk_div <= 'b0;
+        clk_div <= clk_div;
       end
     end
   end

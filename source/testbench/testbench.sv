@@ -31,9 +31,8 @@ module fec_top_tb;
   int                uart_br;
   //bit [15:0]         uart_ps = (`SYS_CLK_FREQ / (uart_br * UART_SC))-1;
   bit [SERIAL_DIV_WIDTH-1:0] ser_clk_div = SERIAL_CLK_DIV;
-  
-// bit[15:0]         uart_ps = `SYS_CLK_FREQ / (uart_br * UART_SC);
   string test;
+  bit [7:0] payload;
   
   fec_top fec_u (
     .clk      (clk),
@@ -64,37 +63,38 @@ module fec_top_tb;
   `TB_CLK(clk, 10)
   `TB_SRSTN(rst_n, clk, 1)
   `TB_DUMP("fec_top_tb.vcd", fec_top_tb, 0) 
-  //`TB_FINISH(100_000_000)
   //`TB_FINISH(50_000)
   
-   initial begin
-     `TB_START
-     `WAIT_CLK(clk, 2)
-     uart_ps = fec_u.uart_prescaler;
-     uart_br =  (`SYS_CLK_FREQ / ((uart_ps+1) * UART_SC));
+  initial begin
+    `TB_START
+    `WAIT_CLK(clk, 2)
+    uart_ps = fec_u.uart_prescaler;
+    uart_br =  (`SYS_CLK_FREQ / ((uart_ps+1) * UART_SC));
      
-     $display("=========   Design and test bench parameters   =========");
-     $display("- Clock freq          : %0d MHz      ", `SYS_CLK_FREQ/1e6);
-     $display("- Clock period        : %0d ns       ", `SYS_CLK_PERIOD);
-     $display("- UART baudrate       : %0d bits/s   ", uart_br);
-     $display("- UART prescaler      : %0d          ", uart_ps);
-     $display("- UART_MDW            : %0d bits     ", UART_MDW);
-     $display("- UART_FAW            : %0d items    ", UART_FAW);
-     $display("- UART_SC             : %0d bits/baud", UART_SC);
-     $display("- UART_GFLEN          : %0d          ", UART_GFLEN);
-     $display("- SERIAL_CLK_DIV      : %0d clocks   ", SERIAL_CLK_DIV);
-     $display("- SERIAL_DIV_WIDTH    : %0d bits     ", SERIAL_DIV_WIDTH);
-     $display("========================================================");
+    $display("=========   Design and test bench parameters   =========");
+    $display("- Clock freq          : %0d MHz      ", `SYS_CLK_FREQ/1e6);
+    $display("- Clock period        : %0d ns       ", `SYS_CLK_PERIOD);
+    $display("- UART baudrate       : %0d bits/s   ", uart_br);
+    $display("- UART prescaler      : %0d          ", uart_ps);
+    $display("- UART_MDW            : %0d bits     ", UART_MDW);
+    $display("- UART_FAW            : %0d items    ", UART_FAW);
+    $display("- UART_SC             : %0d bits/baud", UART_SC);
+    $display("- UART_GFLEN          : %0d          ", UART_GFLEN);
+    $display("- SERIAL_CLK_DIV      : %0d clocks   ", SERIAL_CLK_DIV);
+    $display("- SERIAL_DIV_WIDTH    : %0d bits     ", SERIAL_DIV_WIDTH);
+    $display("========================================================");
     
-     if($value$plusargs ("TEST=%s", test))
-       $display ("[%0t][TB] Running test %s",$time ,test);
-     else begin
-       $display("[%0t][TB] No test is selected, finishing ", $time);
-       $finish;
-     end
+    if($value$plusargs ("TEST=%s", test))
+      $display ("[%0t][TB] Running test %s",$time ,test);
+    else begin
+      $display("[%0t][TB] No test is selected, finishing ", $time);
+      $finish;
+    end
 
-         
-    $monitor("[%0t][TB] fec_fsm.state: %s", $time, fec_u.u_fec_fsm.state.name());
+    if($value$plusargs ("PAYLOAD=%0d", payload))
+      $display ("[%0t][TB] Using payload %0d",$time ,payload);
+
+    $monitor("[%0t][TB] fec_fsm.state: %s", $time, fec_u.fec_fsm_u.state.name());
     //downlink_monitor(/*clk, fec_u.dl_out*/);
     
     uart_setup();
@@ -105,6 +105,7 @@ module fec_top_tb;
        "test_fec_tx_min_payload":      test_fec_data_tx(1);
        "test_fec_tx_8_payload":        test_fec_data_tx(8);
        "test_fec_tx_max_payload":      test_fec_data_tx(255);
+       "test_fec_tx_set_payload":      test_fec_data_tx(payload);
        "test_fec_tx_invalid_payload":  test_fec_data_tx_invalid_payloads();
        "test_fec_tx_boundary_payload": test_fec_data_tx_boundary_payloads();
        "test_fec_tx_err_inj_mask_0":   test_fec_data_tx_err_inj(64'hbab1_cafe_dead_beef, 7);
