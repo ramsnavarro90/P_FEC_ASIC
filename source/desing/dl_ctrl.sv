@@ -10,7 +10,7 @@ module dl_controller #(
 )(
   input  logic clk,
   input  logic rst_n,
-  input  logic [2**UART_FAW-2:0][UART_MDW-1:0] data_in,   // 56 bits
+  input  logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] data_in,   // 56 bits
   input  logic                enc_used,                   // 0 or 1 encoder selection
   input  logic                dl_start,                   // start trigger
   input  logic [7:0] msg_len,
@@ -209,15 +209,15 @@ module dl_controller #(
   end
   
   
-  // Connect rf_packet_scramble and serializer
+  // Connect packet_scramble and serializer
   logic [SERIAL_DATA_DEPTH-1:0][SERIAL_DATA_WIDTH-1:0] scrambled_data;
   
   // Packet Scrambler
 
-  rf_packet_scramble #(
+  packet_scramble #(
     .DATA_WIDTH       (SERIAL_DATA_WIDTH),
     .DATA_DEPTH       (SERIAL_DATA_DEPTH)
-  ) dl_rf_pkt_u (
+  ) packet_scramble_u (
     .enc_used       (enc_used_r),
     .data_in        (data_in),
     .crc0_data      (crc0_data),
@@ -239,7 +239,7 @@ module dl_controller #(
     .DATA_WIDTH  (SERIAL_DATA_WIDTH),
     .DATA_DEPTH  (SERIAL_DATA_DEPTH),
     .DIV_WIDTH   (SERIAL_DIV_WIDTH)
-  ) dl_ser_u (
+  ) serialilzer_u (
     .clk         (clk),
     .rst_n       (rst_n),
     .start       (serial_start),

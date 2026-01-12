@@ -190,10 +190,11 @@ module deserializer #(
         end
 
         S_DESERIALIZE: begin
-          par_out[sample_count][bit_count] <= serial_in;
+          //par_out[sample_count][bit_count] <= serial_in;
 
           if (serial_en && clk_cnt == (clk_div_i)) begin  
             clk_cnt <= 'b0;
+            par_out[sample_count][bit_count] <= serial_in;
 
             if (bit_count == width_r) begin
               bit_count <= 'b0;

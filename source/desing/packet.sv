@@ -1,19 +1,19 @@
 import fec_pkg::*;
 
-module rf_packet_scramble #(
+module packet_scramble #(
   parameter int DATA_WIDTH = 10,
   parameter int DATA_DEPTH = 8
 )(
   input  logic  enc_used,
   
   // From FEC engine
-  // 64-bit encoding signals
-  input  logic [2**UART_FAW-2:0][UART_MDW-1:0] data_in, // 56 bits = d0 to d55
+  // 64-bit Encoding cluster signals
+  input  logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] data_in, // 56 bits = d0 to d55
   input  logic [CRC0_WIDTH-1:0]      crc0_data,          // d56 to d63
   input  logic [ENC0_DATA_DEPTH-1:0] enc0_row_p,         // r0 to r7
   input  logic [ENC0_DATA_WIDTH-1:0] enc0_col_p,         // c0 to c7
   
-  // 16-bit encoding signals
+  // 16-bit Encoding cluster signals
   input  logic [7:0] msg_len,
   input  logic [3:0] msg_tag,
   input  logic [CRC1_WIDTH-1:0]      crc1_data,          // d12 to d15
@@ -147,7 +147,6 @@ module rf_packet_scramble #(
   assign r6 = enc0_row_p[6];
   assign r7 = enc0_row_p[7];
   
-//assign format0 = '{
   assign format0 = {  
     // Bit Index:  9   8   7   6   5   4   3   2   1   0
     // Signal:    c7  d63 d55 d54 d53 r7  d52 d51 d50 d49
@@ -175,36 +174,9 @@ module rf_packet_scramble #(
     /* 0 */ {c0, d56, d6,  d5,  d4,  r0, d3,  d2,  d1,  d0}
   };
   
-//   assign format0 = '{
-//     //       c7             d63            d55            d54            d53            r7             d52            d51            d50            d49
-//     /* 7 */ {enc0_col_p[7], crc0_data[7], data_in[6][7], data_in[6][6], data_in[6][5], enc0_row_p[7], data_in[6][4], data_in[6][3], data_in[6][2], data_in[6][1]}, 
-    
-//     //       c6             d62            d48            d47            d46            r6             d45            d44            d43            d42
-//     /* 6 */ {enc0_col_p[6], crc0_data[6], data_in[6][0], data_in[5][7], data_in[5][6], enc0_row_p[6], data_in[5][5], data_in[5][4], data_in[5][3], data_in[5][2]},
-    
-//     //       c5             d61            d41            d40            d39            r5             d38            d37            d36            d35
-//     /* 5 */ {enc0_col_p[5], crc0_data[5], data_in[5][1], data_in[5][0], data_in[4][7], enc0_row_p[5], data_in[4][6], data_in[4][5], data_in[4][4], data_in[4][3]},
-    
-//     //       c4             d60            d34            d33            d32            r4             d31            d30            d29            d28
-//     /* 4 */ {enc0_col_p[4], crc0_data[4], data_in[4][2], data_in[4][1], data_in[4][0], enc0_row_p[4], data_in[3][7], data_in[3][6], data_in[3][5], data_in[3][4]},
-    
-//     //       c3             d59            d27            d26            d25            r3             d24            d23            d22            d21
-//     /* 3 */ {enc0_col_p[3], crc0_data[3], data_in[3][3], data_in[3][2], data_in[3][1], enc0_row_p[3], data_in[3][0], data_in[2][7], data_in[2][6], data_in[2][5]},
-    
-//     //       c2             d58            d20            d19            d18            r2             d17            d16            d15            d14
-//     /* 2 */ {enc0_col_p[2], crc0_data[2], data_in[2][4], data_in[2][3], data_in[2][2], enc0_row_p[2], data_in[2][1], data_in[2][0], data_in[1][7], data_in[1][6]},
-    
-//     //       c1             d57            d13            d12            d11            r1             d10            d9             d8             d7
-//     /* 1 */ {enc0_col_p[1], crc0_data[1], data_in[1][5], data_in[1][4], data_in[1][3], enc0_row_p[1], data_in[1][2], data_in[1][1], data_in[1][0], data_in[0][7]},
-    
-//     //       c0             d56            d6             d5             d4             r0             d3             d2             d1             d0
-//     /* 0 */ {enc0_col_p[0], crc0_data[0], data_in[0][6], data_in[0][5], data_in[0][4], enc0_row_p[0], data_in[0][3], data_in[0][2], data_in[0][1], data_in[0][0]}
-//   };
-
   // Frame format 1 (16-bit frame)  
   logic [DATA_DEPTH-1:0][DATA_WIDTH-1:0] format1;
-    
-//  assign format1 = '{
+  
   assign format1 = {
     /* 7 */ {10'b0000000000}, 
     /* 6 */ {10'b0000000000}, 
@@ -221,112 +193,175 @@ module rf_packet_scramble #(
 
   };
   
-
   // Output multiplexer
   assign par_out = (enc_used)? format1 : format0;
 
 endmodule
 
 
-/*
-module rf_packet_unscramble #(
-//   parameter int UART_MDW = 8,
-//   parameter int UART_FAW = 3,
-  parameter int CRC0_WIDTH = 8,
-  parameter int CRC1_WIDTH = 4
-//   parameter int ENC0_DATA_DEPTH = 8,
-//   parameter int ENC0_DATA_WIDTH = 10,
-//   parameter int ENC1_DATA_DEPTH = 4,
-//   parameter int ENC1_DATA_WIDTH = 6
+module packet_unscramble #(
+  parameter int DATA_WIDTH = 10,
+  parameter int DATA_DEPTH = 8
 )(
-  input  logic enc_used,
-
-  // Input desde el serializer (formato scramble)
-  input  logic [ENC0_DATA_DEPTH-1:0][ENC0_DATA_WIDTH-1:0] par_in,
-
-  // Outputs comunes
-  output logic [UART_MDW-1:0] data_out [2**UART_FAW-2:0], // d0 to d55
-  output logic [CRC0_WIDTH-1:0] crc0_data,                // d56 to d63
-  output logic [CRC1_WIDTH-1:0] crc1_data,                // d12 to d15
-  output logic [ENC0_DATA_DEPTH-1:0] enc0_row_p,
-  output logic [ENC0_DATA_WIDTH-1:0] enc0_col_p,
-  output logic [ENC1_DATA_DEPTH-1:0] enc1_row_p,
-  output logic [ENC1_DATA_WIDTH-1:0] enc1_col_p
+  input  logic  enc_used,
+  // Output to UL FEC engine
+  output logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] data_out, // 56 bits = d0 to d55
+  // 64-bit Decoding cluster signals
+  output logic [CRC0_WIDTH-1:0]      crc0_data,          // d56 to d63
+  output logic [ENC0_DATA_DEPTH-1:0] enc0_row_p,         // r0 to r7
+  output logic [ENC0_DATA_WIDTH-1:0] enc0_col_p,         // c0 to c7
+  // 16-bit Decoding cluster signals
+  output logic [CRC1_WIDTH-1:0]      crc1_data,          // d12 to d15
+  output logic [ENC1_DATA_DEPTH-1:0] enc1_row_p,         // r0 to r3
+  output logic [ENC1_DATA_WIDTH-1:0] enc1_col_p,         // c0 to c3
+  // Input from deserializer
+  input  logic [DATA_DEPTH-1:0][DATA_WIDTH-1:0] par_in
 );
 
-  // Temporal variables to rearrange the input
-  logic [55:0] data_tmp;
-  logic [7:0]  crc0_tmp;
-  logic [3:0]  crc1_tmp;
-
-  // Decoder for Encoder 0 (64-bit frame)
   always_comb begin
-    if (enc_used == 1'b0) begin
-      data_tmp = {
-        par_in[7][9:6], par_in[6][9:6], par_in[5][9:6], par_in[4][9:6],
-        par_in[3][9:6], par_in[2][9:6], par_in[1][9:6], par_in[0][9:6],
-        par_in[7][4:1], par_in[6][4:1], par_in[5][4:1], par_in[4][4:1],
-        par_in[3][4:1], par_in[2][4:1], par_in[1][4:1], par_in[0][4:1]
-      };
 
-      // Assign 56 data bits (d0–d55)
-      for (int i = 0; i < 56; i++) begin
-        data_out[i] = data_tmp[i];
-      end
+    // 16-bit Encoding cluster #1 frame
+    if(enc_used) begin
+      data_out[0][0]    = par_in[0][0]; // d0
+      data_out[0][1]    = par_in[0][1]; // d1
+      data_out[0][2]    = par_in[0][3]; // d2
+      data_out[0][3]    = par_in[1][0]; // d3
+      data_out[0][7:4]  = 'b0; // unused bits
 
-      // Assign CRC0 bits (d56–d63)
-      for (int i = 0; i < 8; i++) begin
-        crc0_data[i] = par_in[i][5];
-      end
+      data_out[1][0]    = par_in[1][1]; // d4
+      data_out[1][1]    = par_in[1][3]; // d5
+      data_out[1][2]    = par_in[2][0]; // d6
+      data_out[1][3]    = par_in[2][1]; // d7
+      data_out[1][7:4]  = 'b0; // unused bits
 
-      // Assign row parity
-      for (int i = 0; i < 8; i++) begin
-        enc0_row_p[i] = par_in[i][5];
-      end
+      data_out[2][0]    = par_in[2][3]; // d8
+      data_out[2][1]    = par_in[3][0]; // d9
+      data_out[2][2]    = par_in[3][1]; // d10
+      data_out[2][3]    = par_in[3][3]; // d11
+      data_out[2][7:4]  = 'b0; // unused bits
 
-      // Assign col parity
-      for (int i = 0; i < 8; i++) begin
-        enc0_col_p[i] = par_in[i][0];
-      end
+      data_out[3][7:0]  = 'b0; // unused bits
+      data_out[4][7:0]  = 'b0; // unused bits
+      data_out[5][7:0]  = 'b0; // unused bits
+      data_out[6][7:0]  = 'b0; // unused bits
+
+      crc1_data[0]      = par_in[0][4]; // d12
+      crc1_data[1]      = par_in[1][4]; // d13
+      crc1_data[2]      = par_in[2][4]; // d14
+      crc1_data[3]      = par_in[3][4]; // d15
+
+      enc1_row_p[0]     = par_in[0][2]; // r0
+      enc1_row_p[1]     = par_in[1][2]; // r1
+      enc1_row_p[2]     = par_in[2][2]; // r2
+      enc1_row_p[3]     = par_in[3][2]; // r3
+
+      enc1_col_p[0]     = par_in[0][5]; // c0
+      enc1_col_p[1]     = par_in[1][5]; // c1
+      enc1_col_p[2]     = par_in[2][5]; // c2
+      enc1_col_p[3]     = par_in[3][5]; // c3
+
+      crc0_data         = 'b0; // Unused data
+      enc0_row_p        = 'b0;
+      enc0_col_p        = 'b0;
+
     end
-  end
+    // 64-bit Encoding cluster #0 frame
+    else begin 
+      data_out[0][0]    = par_in[0][0]; // d0
+      data_out[0][1]    = par_in[0][1]; // d1
+      data_out[0][2]    = par_in[0][2]; // d2
+      data_out[0][3]    = par_in[0][3]; // d3
+      data_out[0][4]    = par_in[0][5]; // d4
+      data_out[0][5]    = par_in[0][6]; // d5
+      data_out[0][6]    = par_in[0][7]; // d6
 
-  // Decoder for Encoder 1 (16-bit frame)
-  always_comb begin
-    if (enc_used == 1'b1) begin
-      // d0–d11
-      data_out[0]  = par_in[0][5];
-      data_out[1]  = par_in[0][4];
-      data_out[2]  = par_in[0][2];
-      data_out[3]  = par_in[1][5];
-      data_out[4]  = par_in[1][4];
-      data_out[5]  = par_in[1][2];
-      data_out[6]  = par_in[2][5];
-      data_out[7]  = par_in[2][4];
-      data_out[8]  = par_in[2][2];
-      data_out[9]  = par_in[3][5];
-      data_out[10] = par_in[3][4];
-      data_out[11] = par_in[3][2];
+      data_out[0][7]    = par_in[1][0]; // d7
+      data_out[1][0]    = par_in[1][1]; // d8
+      data_out[1][1]    = par_in[1][2]; // d9
+      data_out[1][2]    = par_in[1][3]; // d10
+      data_out[1][3]    = par_in[1][5]; // d11
+      data_out[1][4]    = par_in[1][6]; // d12
+      data_out[1][5]    = par_in[1][7]; // d13
 
-      // d12–d15 → CRC1
-      crc1_data[0] = par_in[0][3];
-      crc1_data[1] = par_in[1][3];
-      crc1_data[2] = par_in[2][3];
-      crc1_data[3] = par_in[3][3];
+      data_out[1][6]    = par_in[2][0]; // d14
+      data_out[1][7]    = par_in[2][1]; // d15
+      data_out[2][0]    = par_in[2][2]; // d16
+      data_out[2][1]    = par_in[2][3]; // d17
+      data_out[2][2]    = par_in[2][5]; // d18
+      data_out[2][3]    = par_in[2][6]; // d19
+      data_out[2][4]    = par_in[2][7]; // d20
 
-      // row parity
-      enc1_row_p[0] = par_in[0][3];
-      enc1_row_p[1] = par_in[1][3];
-      enc1_row_p[2] = par_in[2][3];
-      enc1_row_p[3] = par_in[3][3];
+      data_out[2][5]    = par_in[3][0]; // d21
+      data_out[2][6]    = par_in[3][1]; // d22
+      data_out[2][7]    = par_in[3][2]; // d23
+      data_out[3][0]    = par_in[3][3]; // d24
+      data_out[3][1]    = par_in[3][5]; // d25
+      data_out[3][2]    = par_in[3][6]; // d26
+      data_out[3][3]    = par_in[3][7]; // d27
 
-      // column parity
-      enc1_col_p[0] = par_in[0][0];
-      enc1_col_p[1] = par_in[1][0];
-      enc1_col_p[2] = par_in[2][0];
-      enc1_col_p[3] = par_in[3][0];
+      data_out[3][4]    = par_in[4][0]; // d28
+      data_out[3][5]    = par_in[4][1]; // d29
+      data_out[3][6]    = par_in[4][2]; // d30
+      data_out[3][7]    = par_in[4][3]; // d31
+      data_out[4][0]    = par_in[4][5]; // d32
+      data_out[4][1]    = par_in[4][6]; // d33
+      data_out[4][2]    = par_in[4][7]; // d34
+
+      data_out[4][3]    = par_in[5][0]; // d35
+      data_out[4][4]    = par_in[5][1]; // d36
+      data_out[4][5]    = par_in[5][2]; // d37
+      data_out[4][6]    = par_in[5][3]; // d38
+      data_out[4][7]    = par_in[5][5]; // d39
+      data_out[5][0]    = par_in[5][6]; // d40
+      data_out[5][1]    = par_in[5][7]; // d41
+
+      data_out[5][2]    = par_in[6][0]; // d42
+      data_out[5][3]    = par_in[6][1]; // d43
+      data_out[5][4]    = par_in[6][2]; // d44
+      data_out[5][5]    = par_in[6][3]; // d45
+      data_out[5][6]    = par_in[6][5]; // d46
+      data_out[5][7]    = par_in[6][6]; // d47
+      data_out[6][0]    = par_in[6][7]; // d48
+
+      data_out[6][1]    = par_in[7][0]; // d49
+      data_out[6][2]    = par_in[7][1]; // d50
+      data_out[6][3]    = par_in[7][2]; // d51
+      data_out[6][4]    = par_in[7][3]; // d52
+      data_out[6][5]    = par_in[7][5]; // d53
+      data_out[6][6]    = par_in[7][6]; // d54
+      data_out[6][7]    = par_in[7][7]; // d55
+
+      crc0_data[0]  = par_in[0][8]; // c0
+      crc0_data[1]  = par_in[1][8]; // c1
+      crc0_data[2]  = par_in[2][8]; // c2
+      crc0_data[3]  = par_in[3][8]; // c3
+      crc0_data[4]  = par_in[4][8]; // c4
+      crc0_data[5]  = par_in[5][8]; // c5
+      crc0_data[6]  = par_in[6][8]; // c6
+      crc0_data[7]  = par_in[7][8]; // c7
+
+      enc0_row_p[0] = par_in[0][4]; // r0
+      enc0_row_p[1] = par_in[1][4]; // r1
+      enc0_row_p[2] = par_in[2][4]; // r2
+      enc0_row_p[3] = par_in[3][4]; // r3
+      enc0_row_p[4] = par_in[4][4]; // r4
+      enc0_row_p[5] = par_in[5][4]; // r5
+      enc0_row_p[6] = par_in[6][4]; // r6
+      enc0_row_p[7] = par_in[7][4]; // r7
+
+      enc0_col_p[0] = par_in[0][9]; // c0
+      enc0_col_p[1] = par_in[1][9]; // c1
+      enc0_col_p[2] = par_in[2][9]; // c2
+      enc0_col_p[3] = par_in[3][9]; // c3
+      enc0_col_p[4] = par_in[4][9]; // c4
+      enc0_col_p[5] = par_in[5][9]; // c5
+      enc0_col_p[6] = par_in[6][9]; // c6
+      enc0_col_p[7] = par_in[7][9]; // c7
+
+      crc1_data  = 'b0;
+      enc1_row_p = 'b0;
+      enc1_col_p = 'b0;
     end
   end
 
 endmodule
-*/

@@ -8,7 +8,7 @@ module uart_tx_arbiter (
   input  logic                rst_n,
   input  logic [1:0]          req,
   output logic [1:0]          grant,
-  input  logic [UART_FAW-1:0] tx_level,
+  input  logic [UART_TX_FAW-1:0] tx_level,
   input  logic [UART_MDW-1:0] wdata_in0,
   input  logic [UART_MDW-1:0] wdata_in1,
   input  logic                wr_in0,
@@ -130,7 +130,6 @@ module uart_tx_arbiter (
     end
   end
   
-  
 endmodule
 
 /*
@@ -176,8 +175,9 @@ endmodule
 */
 
 module EF_UART #(
-    parameter MDW = 9,   // Max data size/width
-    parameter FAW = 4,   // FIFO Address width; Depth=2^AW
+    parameter MDW = 9,      // Max data size/width
+    parameter TX_FAW = 4,   // TX FIFO Address width; Depth=2^AW
+    parameter RX_FAW = 4,   // RX FIFO Address width; Depth=2^AW
     parameter SC  = 8,   // Number of samples per bit/baud
     parameter GFLEN = 8  // Length (number of stages) of the glitch filter
   ) (
@@ -207,20 +207,20 @@ module EF_UART #(
   
     output  wire            tx_empty,
     output  wire            tx_full,
-    output  wire [FAW-1:0]  tx_level,
+    output  wire [TX_FAW-1:0]  tx_level,
     output  wire            tx_level_below,
     output  wire            tx_done,
     input   wire            tx_fifo_flush,
-    output  wire [2**FAW-1:0][MDW-1:0]  tx_array_reg,
+    output  wire [2**TX_FAW-1:0][MDW-1:0]  tx_array_reg,
 
     output  wire [MDW-1:0]  rdata,
     output  wire            rx_empty,
     output  wire            rx_full,
-    output  wire [FAW-1:0]  rx_level,
+    output  wire [RX_FAW-1:0]  rx_level,
     output  wire            rx_level_above,
     output  wire            rx_done,
     input   wire            rx_fifo_flush,
-    output  wire [2**FAW-1:0][MDW-1:0]  rx_array_reg,
+    output  wire [2**RX_FAW-1:0][MDW-1:0]  rx_array_reg,
 
     output  wire            break_flag,
     output  wire            match_flag,
@@ -292,7 +292,9 @@ module EF_UART #(
   );
   
     
-  fifo #( .DW(FIFO_DW), .AW(FAW)
+  fifo #( 
+    .DW(FIFO_DW),
+    .AW(TX_FAW)
     ) fifo_tx (
       .clk(clk),
       .rst_n(rst_n),
@@ -307,7 +309,10 @@ module EF_UART #(
       .array_reg(tx_array_reg)
     );
 
-    UART_TX #(.MDW(MDW), .NUM_SAMPLES(SC)) uart_tx (
+    UART_TX #(
+        .MDW(MDW),
+        .NUM_SAMPLES(SC)
+    ) uart_tx (
         .clk(clk),
         .resetn(rst_n),
         .tx_start(~tx_empty),
@@ -320,7 +325,10 @@ module EF_UART #(
         .tx(tx)
     );
 
-    fifo #(.DW(FIFO_DW), .AW(FAW)) fifo_rx (
+    fifo #(
+        .DW(FIFO_DW),
+        .AW(RX_FAW)
+    ) fifo_rx (
         .clk(clk),
         .rst_n(rst_n),
         .rd(rd),
@@ -330,11 +338,14 @@ module EF_UART #(
         .full(rx_full),
         .rdata(rdata),
         .level(rx_level),
-      .flush(rx_fifo_flush),
-      . array_reg(rx_array_reg)
+        .flush(rx_fifo_flush),
+        .array_reg(rx_array_reg)
     );
 
-    UART_RX #(.MDW(MDW), .NUM_SAMPLES(SC)) uart_rx (
+    UART_RX #(
+        .MDW(MDW), 
+        .NUM_SAMPLES(SC)
+    ) uart_rx (
         .clk(clk),
         .resetn(rst_n),
         .b_tick(b_tick & rx_en),

@@ -30,7 +30,7 @@ module fec_top_tb;
   bit [15:0]         uart_ps;
   int                uart_br;
   //bit [15:0]         uart_ps = (`SYS_CLK_FREQ / (uart_br * UART_SC))-1;
-  bit [SERIAL_DIV_WIDTH-1:0] ser_clk_div = SERIAL_CLK_DIV;
+  bit [SERIAL_DIV_WIDTH-1:0] ser_clk_div;
   string test;
   bit [7:0] payload;
   
@@ -70,6 +70,7 @@ module fec_top_tb;
     `WAIT_CLK(clk, 2)
     uart_ps = fec_u.uart_prescaler;
     uart_br =  (`SYS_CLK_FREQ / ((uart_ps+1) * UART_SC));
+    ser_clk_div = fec_u.dl_ctrl_clk_div;
      
     $display("=========   Design and test bench parameters   =========");
     $display("- Clock freq          : %0d MHz      ", `SYS_CLK_FREQ/1e6);
@@ -77,10 +78,11 @@ module fec_top_tb;
     $display("- UART baudrate       : %0d bits/s   ", uart_br);
     $display("- UART prescaler      : %0d          ", uart_ps);
     $display("- UART_MDW            : %0d bits     ", UART_MDW);
-    $display("- UART_FAW            : %0d items    ", UART_FAW);
+    $display("- UART_TX_FAW         : %0d bus size ", UART_TX_FAW);
+    $display("- UART_RX_FAW         : %0d bus size ", UART_RX_FAW);
     $display("- UART_SC             : %0d bits/baud", UART_SC);
     $display("- UART_GFLEN          : %0d          ", UART_GFLEN);
-    $display("- SERIAL_CLK_DIV      : %0d clocks   ", SERIAL_CLK_DIV);
+    $display("- SERIAL_CLK_DIV      : %0d clocks   ", ser_clk_div);
     $display("- SERIAL_DIV_WIDTH    : %0d bits     ", SERIAL_DIV_WIDTH);
     $display("========================================================");
     
@@ -94,7 +96,7 @@ module fec_top_tb;
     if($value$plusargs ("PAYLOAD=%0d", payload))
       $display ("[%0t][TB] Using payload %0d",$time ,payload);
 
-    $monitor("[%0t][TB] fec_fsm.state: %s", $time, fec_u.fec_fsm_u.state.name());
+    $monitor("[%0t][TB] dl_fec_fsm.state: %s", $time, fec_u.dl_fec_fsm_u.state.name());
     //downlink_monitor(/*clk, fec_u.dl_out*/);
     
     uart_setup();
@@ -189,11 +191,11 @@ module fec_top_tb;
       uart_receive_8b(err_resp[7:0]); // Err response command
       uart_receive_8b(err_code[7:0]); // Command result (Error code)
       
-      // check for error response
-      if(err_resp==CMD_ERR_RS)
-        $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, CMD_ERR_RS);
+      // Check for error response
+      if(err_resp==RSP_CMD_ERR) // command_t
+        $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, RSP_CMD_ERR);
       else begin
-        $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, CMD_ERR_RS);
+        $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, RSP_CMD_ERR);
         result = 1;
       end
       // Check for error code
@@ -236,11 +238,11 @@ module fec_top_tb;
       uart_receive_8b(err_resp[7:0]); // Err response command
       uart_receive_8b(err_code[7:0]); // Command result (Error code)
       
-      // check for error response
-      if(err_resp==CMD_ERR_RS)
-        $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, CMD_ERR_RS);
+      // Check for error response
+      if(err_resp==RSP_CMD_ERR) // command_t
+        $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, RSP_CMD_ERR);
       else begin
-        $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, CMD_ERR_RS);
+        $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, RSP_CMD_ERR);
         result = 1;
       end
       // Check for error code
@@ -278,11 +280,11 @@ module fec_top_tb;
       command = $urandom_range(5,15); // use undefined command ids
       fec_command_error(command, err_resp,  err_code);
       
-      // check for error response
-      if(err_resp==CMD_ERR_RS)
-        $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, CMD_ERR_RS);
+      // Check for error response
+      if(err_resp==RSP_CMD_ERR) // command_t
+        $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, RSP_CMD_ERR);
       else begin
-        $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, CMD_ERR_RS);
+        $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, RSP_CMD_ERR);
         result = 1;
       end
       // Check for error code
@@ -401,11 +403,11 @@ module fec_top_tb;
     //@(negedge dl_en);
     //@(negedge dl_en);
     
-    // check for response command
-    if(rsp_cmd==CMD_FEC_RS)
-      $display("[%0t][TB-TEST] FEC response command ID received is as expeted: %0d.", $time, CMD_FEC_RS);
+    // Check for response command
+    if(rsp_cmd==RSP_TX_RES) // command_t
+      $display("[%0t][TB-TEST] FEC response command ID received is as expeted: %0d.", $time, RSP_TX_RES);
     else begin
-      $error("[%0t][TB-TEST] FEC response command ID received mismatches. Actual: %0d Expected: %0d", $time, rsp_cmd, CMD_FEC_RS);
+      $error("[%0t][TB-TEST] FEC response command ID received mismatches. Actual: %0d Expected: %0d", $time, rsp_cmd, RSP_TX_RES);
       result = 1;
     end
     // check for response tag
@@ -458,10 +460,10 @@ module fec_top_tb;
     uart_receive_8b(err_code[7:0]); // Command result (Error code)
     
     // check for error response
-    if(err_resp==CMD_ERR_RS)
-      $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, CMD_ERR_RS);
+    if(err_resp==RSP_CMD_ERR) // command_t
+      $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, RSP_CMD_ERR);
     else begin
-      $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, CMD_ERR_RS);
+      $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, RSP_CMD_ERR);
       result = 1;
     end
     // Check for error code
@@ -481,11 +483,11 @@ module fec_top_tb;
     uart_receive_8b(err_resp[7:0]); // Err response command
     uart_receive_8b(err_code[7:0]); // Command result (Error code)
     
-    // check for error response
-    if(err_resp==CMD_ERR_RS)
-      $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, CMD_ERR_RS);
+    // Check for error response
+    if(err_resp==RSP_CMD_ERR) // command_t
+      $display("[%0t][TB-TEST] FEC Error response command ID received is as expeted: %0d.", $time, RSP_CMD_ERR);
     else begin
-      $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, CMD_ERR_RS);
+      $error("[%0t][TB-TEST] FEC Error response command ID received mismatches. Actual: %0d Expected: %0d", $time, err_resp, RSP_CMD_ERR);
       result = 1;
     end
     // Check for error code
@@ -538,7 +540,7 @@ module fec_top_tb;
     
     $display("[%0t][TB-TASK] FEC Data transmit with timeout error start. Message length: %0d, Tag: %0d Timeout on %s Clk cyles: %0d", $time, msg_len, msg_tag, uart_error.name(), timeout_clk_cycles);
     
-    uart_send_8b(CMD_FEC_TX);// 1: Command     : 2: transmit
+    uart_send_8b(CMD_TX_MSG);// 1: Command     : transmit (command_t)
     if(uart_error==UART_RX_RTO_COMMAND) begin repeat(timeout_clk_cyles) @(posedge clk); return; end
     
     uart_send_8b(msg_len);   // 2: Message lenght : msg_len
@@ -563,7 +565,7 @@ module fec_top_tb;
     static bit [3:0] msg_tag = $urandom_range(0,15);
     $display("[%0t][TB-TASK] FEC Data transmit start with delay. Message length: %0d, Tag: %0d", $time, msg_len, msg_tag);
     
-    uart_send_8b(CMD_FEC_TX);// 1: Command     : 2: transmit
+    uart_send_8b(CMD_TX_MSG);// 1: Command     : 2: transmit (command_t)
     uart_send_8b(msg_len);   // 2: Message lenght : msg_len
     
     if(msg_len==0) return;
@@ -579,6 +581,7 @@ module fec_top_tb;
   
   
   task fec_data_transmit_uart_response(output bit[7:0] rsp_cmd, output bit[7:0] rsp_tag, output bit[7:0] rsp_code);
+    $display("[%0t][TB-TASK] FEC Data transmit UART response start.", $time);
     uart_receive_8b(rsp_cmd);
     uart_receive_8b(rsp_tag);
     uart_receive_8b(rsp_code);
@@ -607,17 +610,40 @@ module fec_top_tb;
     //bit [3:0] msg_tag = $urandom_range(0,15);
     $display("[%0t][TB-TASK] FEC Data transmit start. Message length: %0d, Tag: %0d", $time, msg_len, msg_tag);
     
-    uart_send_8b(CMD_FEC_TX);// 1: Command        : 2: transmit
-    uart_send_8b(msg_len);   // 2: Message lenght : msg_len
-    if(msg_len==0) return;
-    uart_send_8b(msg_tag);   // 3: Message Tag
-    repeat(msg_len) begin    // 4: Message        : Random data
-      uart_send_8b($urandom_range(0,255));
+    if(msg_len==0) begin
+      $error("[%0t][TB-TASK] Message lenght must be greather than 0", $time);
+      return;
     end
+
     fork
-      fec_data_transmit_uart_response(rsp_cmd, rsp_tag, rsp_code);
-      fec_data_transmit_dl_stream(msg_len);
+      begin
+        uart_send_8b(CMD_TX_MSG);// 1: Command        : transmit (command_t)
+        uart_send_8b(msg_len);   // 2: Message lenght : msg_len
+        uart_send_8b(msg_tag);   // 3: Message Tag    : msg_tag
+        repeat(msg_len) begin    // 4: Message data   : Random data
+          uart_send_8b($urandom_range(0,255));
+        end
+      end
+
+      begin
+        fec_data_transmit_uart_response(rsp_cmd, rsp_tag, rsp_code);
+      end
+      
+      begin
+        fec_data_transmit_dl_stream(msg_len);
+      end
     join
+
+    // uart_send_8b(CMD_TX_MSG);// 1: Command        : transmit (command_t)
+    // uart_send_8b(msg_len);   // 2: Message lenght : msg_len
+    // uart_send_8b(msg_tag);   // 3: Message Tag    : msg_tag
+    // repeat(msg_len) begin    // 4: Message data   : Random data
+    //   uart_send_8b($urandom_range(0,255));
+    // end
+    // fork
+    //   fec_data_transmit_uart_response(rsp_cmd, rsp_tag, rsp_code);
+    //   fec_data_transmit_dl_stream(msg_len);
+    // join
     
     $display("[%0t][TB-TASK] FEC Data transmit end. Tag: %0d", $time, msg_tag);
   endtask
@@ -631,8 +657,8 @@ module fec_top_tb;
     
     // Physical access
     if(acc) begin
-      uart_send_8b(CMD_REG_READ);       // 1: Command:  Reg read
-      uart_send_8b(reg_addr);           // 2: Register offset
+      uart_send_8b(CMD_REG_READ);       // 1: Command:  Reg read (command_t)
+      uart_send_8b(reg_addr);           // 2: Register address
       uart_receive_8b(reg_data[31:24]); // Register data - MSB
       uart_receive_8b(reg_data[23:16]);
       uart_receive_8b(reg_data[15: 8]);
@@ -669,8 +695,8 @@ module fec_top_tb;
     
     // Physical access
     if(acc) begin 
-      uart_send_8b(CMD_REG_WRITE);    // 1: Command:  Reg write
-      uart_send_8b(reg_addr);         // 2: Register offset
+      uart_send_8b(CMD_REG_WRITE);    // 1: Command:  Reg write (command_t)
+      uart_send_8b(reg_addr);         // 2: Register address
       uart_send_8b(reg_data[31:24]);  // 3: Config data - MSB
       uart_send_8b(reg_data[23:16]);
       uart_send_8b(reg_data[15: 8]);
@@ -679,7 +705,6 @@ module fec_top_tb;
       uart_receive_8b(rsp_cmd); // Register data - MSB
       uart_receive_8b(rsp_addr);
       uart_receive_8b(rsp_code);
-      
     end
     
     // Virtual acces
@@ -954,7 +979,7 @@ module fec_top_tb;
   
     
   task dl_ctrl_setup();
-    force fec_u.dl_ctrl_clk_div  = ser_clk_div;
+    //force fec_u.dl_ctrl_clk_div  = ser_clk_div;
   endtask
   
   

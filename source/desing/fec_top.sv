@@ -1,4 +1,3 @@
-
 //`timescale        1ns/1ps
 //`default_nettype  none // Commented line to prevent Questasim error: (vlog-2892) Net type of 'clk' was not explicitly declared.
 
@@ -11,18 +10,20 @@ import fec_pkg::*;
 //`include "reg_cfg.sv"
 
 module fec_top(
-  input  logic  clk,      // System
+  // System
+  input  logic  clk,
   input  logic  rst_n,
-  input  logic  uart_rx,  // UART
+  // UART
+  input  logic  uart_rx,
   output logic  uart_tx,
-  output logic  dl_ready, // DL Ready
-  output logic  dl_out,   // Downlink
+   // Downlink
+  output logic  dl_ready,
+  output logic  dl_out,
   output logic  dl_en,
-  input  logic  ul_in,    // Uplink
+  // Uplink
+  input  logic  ul_in,
   input  logic  ul_en
   );
-  
-  // Logic variables
   
   // APB Register Config
   logic                      apb_psel;
@@ -56,7 +57,6 @@ module fec_top(
   logic [3:0]          uart_data_size;
   logic                uart_stop_bits_count;
   logic [2:0]          uart_parity_type;
-  
   //logic [3:0]          uart_txfifotr;
   //logic [3:0]          uart_rxfifotr;
   //logic [UART_MDW-1:0] uart_match_data;
@@ -66,26 +66,22 @@ module fec_top(
   //logic                uart_tx_flush;
   //logic                uart_rx_flush;
   logic                uart_rx_fifo_reg;
-
   logic                uart_tx_empty;
   logic                uart_tx_full;
   logic                uart_tx_done;  
-  logic [2**UART_FAW-1:0][UART_MDW-1:0] uart_tx_array_reg;
-  logic [UART_FAW-1:0] uart_tx_level;
+  logic [2**UART_TX_FAW-1:0][UART_MDW-1:0] uart_tx_array_reg;
+  logic [UART_TX_FAW-1:0] uart_tx_level;
   logic                uart_tx_level_below;
   logic                uart_tx_flush;
-  
   logic                uart_rx_empty;
   logic                uart_rx_full;
   logic                uart_rx_done;
-  logic [2**UART_FAW-1:0][UART_MDW-1:0] uart_rx_array_reg;
-  logic [UART_FAW-1:0] uart_rx_level;
+  logic [2**UART_RX_FAW-1:0][UART_MDW-1:0] uart_rx_array_reg;
+  logic [UART_RX_FAW-1:0] uart_rx_level;
   logic                uart_rx_level_above;
   logic                uart_rx_flush;
-  
   logic [1:0]          uart_tx_grant;
   logic [1:0]          uart_tx_req;
-  
   logic                uart_break_flag;
   logic                uart_match_flag;
   logic                uart_frame_error_flag;
@@ -94,8 +90,8 @@ module fec_top(
   logic                uart_timeout_flag;
   logic [1:0]          uart_fatal_errors;
   
-  logic [2**UART_FAW-1:0][UART_MDW-1:0] dl_fec_data_out;  
-//logic [3:0]                  dl_fec_frm_type;
+  // Downlink FEC signals
+  logic [2**UART_RX_FAW-1:0][UART_MDW-1:0] dl_fec_data_out;
   logic [7:0]                  dl_msg_len;
   logic [3:0]                  dl_fec_msg_tag;  
   logic [ENC0_DATA_DEPTH-1:0]  dl_fec_enc0_row_p;
@@ -108,56 +104,20 @@ module fec_top(
   
   logic                        dl_uart_tx_wr;
   logic [UART_MDW-1:0]         dl_uart_tx_wdata;  
-  logic [1:0]                  dl_uart_tx_grant;
+  logic                        dl_uart_tx_grant;
   logic                        dl_uart_tx_req;
+
+  // Uplink FEC signals
+  logic                        ul_uart_tx_wr;
+  logic [UART_MDW-1:0]         ul_uart_tx_wdata;
+  logic                        ul_uart_tx_grant;
+  logic                        ul_uart_tx_req;
   
-  assign dl_uart_tx_grant  = {1'b0, uart_tx_grant[0]};
+  assign dl_uart_tx_grant  =  uart_tx_grant[0];
+  assign ul_uart_tx_grant  =  uart_tx_grant[1];
   assign uart_fatal_errors = {uart_frame_error_flag, uart_timeout_flag};
   
-  // ====== FEC Control FSM  =======
-  fec_fsm fec_fsm_u (
-    .clk                    (clk),
-    .rst_n                  (rst_n),
-    .ready                  (dl_ready),
-    
-    // UART Control
-  //.uart_rx_array_0        (uart_rx_array_reg[0]),
-    .uart_rx_array          (uart_rx_array_reg),
-    .uart_rx_done           (uart_rx_done),
-    .uart_rx_level          (uart_rx_level),
-  //.uart_rx_fifo_flush     (uart_rx_flush),
-    .uart_rx_fifo_flush     (uart_rx_flush_fsm),
-    .uart_rx_fifo_reg       (uart_rx_fifo_reg),
-    .uart_tx_level          (uart_tx_level),
-    .uart_fatal_errors      (uart_fatal_errors),
-    
-    // Downlink control
-    .dl_uart_tx_wr          (dl_uart_tx_wr),
-    .dl_uart_tx_wdata       (dl_uart_tx_wdata),
-    .dl_uart_tx_grant       (dl_uart_tx_grant),
-    .dl_uart_tx_req         (dl_uart_tx_req),
-  //.dl_fec_frm_type        (dl_fec_frm_type),
-    .dl_fec_msg_tag         (dl_fec_msg_tag),
-    .dl_fec_msg_len         (dl_msg_len),
-    
-    .dl_fec_crc0_start      (dl_fec_crc0_start),
-    .dl_fec_enc0_done       (dl_fec_enc0_done),
-    .dl_fec_crc1_start      (dl_fec_crc1_start),
-    .dl_fec_enc1_done       (dl_fec_enc1_done),
-    .dl_ctrl_enc_used       (dl_ctrl_enc_used),
-    .dl_ctrl_start          (dl_ctrl_start),
-    .dl_ctrl_ser_en         (dl_en),
-    
-    // Register Access
-    .psel                   (apb_psel),
-    .penable                (apb_penable),
-    .pwrite                 (apb_pwrite),
-    .paddr                  (apb_paddr),
-    .pwdata                 (apb_pwdata),
-    .prdata                 (apb_prdata),
-    .pslverr                (apb_pslverr)
-  );
-  
+ 
   // ======  Register configuration (with AMBA APB)  ======= 
   logic [15:0] uart_prescaler_reg;
   logic [04:0] uart_ctrl_reg;
@@ -209,12 +169,12 @@ module fec_top(
   assign uart_tx_flush          = 1'b0;
   assign uart_rd                = 1'b0;
   assign uart_wr                = 1'b0;
-  
-  assign uart_tx_req            = {1'b0, dl_uart_tx_req};
+  assign uart_tx_req            = {ul_uart_tx_req, dl_uart_tx_req};
   
   EF_UART #(
     .MDW              (UART_MDW), 
-    .FAW              (UART_FAW),
+    .TX_FAW           (UART_TX_FAW),
+    .RX_FAW           (UART_RX_FAW),
     .SC               (UART_SC),
     .GFLEN            (UART_GFLEN)
     ) uart_u (
@@ -226,10 +186,10 @@ module fec_top(
     .rx_en            (uart_rx_en),
     .rd               (uart_rd),
     
-    .wr0              (dl_uart_tx_wr), // FEC Control FSM
+    .wr0              (dl_uart_tx_wr),  // DL FEC FSM
     .wdata0           (dl_uart_tx_wdata),
-    .wr1              (1'b0),           // UL FEC Engine TBD
-    .wdata1           (7'b0),
+    .wr1              (ul_uart_tx_wr),  // UL FEC FSM
+    .wdata1           (ul_uart_tx_wdata),
     .req              (uart_tx_req),
     .grant            (uart_tx_grant),
     
@@ -270,14 +230,11 @@ module fec_top(
     .tx               (uart_tx)
   );
   
-  
-  logic [2**UART_FAW-1:0][UART_MDW-1:0] uart_rx_array_r ;
+  logic [2**UART_RX_FAW-1:0][UART_MDW-1:0] uart_rx_array_r ;
   
   always_ff @(posedge clk or negedge rst_n) begin
     if(~rst_n)
-      //for(int i=0; i<2**UART_FAW; i++)
-          //uart_rx_array_r[i] <= 'h0;
-          uart_rx_array_r <= 'h0;
+      uart_rx_array_r <= 'h0;
     else
       if(uart_rx_fifo_reg) begin
         uart_rx_array_r <= uart_rx_array_reg;
@@ -287,57 +244,89 @@ module fec_top(
         uart_rx_array_r <= uart_rx_array_r;
   end
   
+  // =========================================================
+  // =                 Downlink data path                    =
+  // =========================================================
+
+  // ====== DL FEC Control FSM  =======
+  
+  dl_fec_fsm dl_fec_fsm_u (
+    .clk                    (clk),
+    .rst_n                  (rst_n),
+    .ready                  (dl_ready),
+    // UART Control
+    .uart_rx_array          (uart_rx_array_reg),
+    .uart_rx_done           (uart_rx_done),
+    .uart_rx_level          (uart_rx_level),
+    .uart_rx_fifo_flush     (uart_rx_flush_fsm),
+    .uart_rx_fifo_reg       (uart_rx_fifo_reg),
+    .uart_tx_level          (uart_tx_level),
+    .uart_fatal_errors      (uart_fatal_errors),
+    // Downlink control
+    .dl_uart_tx_wr          (dl_uart_tx_wr),
+    .dl_uart_tx_wdata       (dl_uart_tx_wdata),
+    .dl_uart_tx_grant       (dl_uart_tx_grant),
+    .dl_uart_tx_req         (dl_uart_tx_req),
+    .dl_fec_msg_tag         (dl_fec_msg_tag),
+    .dl_fec_msg_len         (dl_msg_len),
+    .dl_fec_crc0_start      (dl_fec_crc0_start),
+    .dl_fec_enc0_done       (dl_fec_enc0_done),
+    .dl_fec_crc1_start      (dl_fec_crc1_start),
+    .dl_fec_enc1_done       (dl_fec_enc1_done),
+    .dl_ctrl_enc_used       (dl_ctrl_enc_used),
+    .dl_ctrl_start          (dl_ctrl_start),
+    .dl_ctrl_ser_en         (dl_en),
+    // Register Access
+    .psel                   (apb_psel),
+    .penable                (apb_penable),
+    .pwrite                 (apb_pwrite),
+    .paddr                  (apb_paddr),
+    .pwdata                 (apb_pwdata),
+    .prdata                 (apb_prdata),
+    .pslverr                (apb_pslverr)
+  );
 
   // ========= DL FEC Engine =========
+  
   dl_fec_engine dl_fec_u (
-    .clk          (clk),
-    .rst_n        (rst_n),
-  //.data_in      (uart_rx_array_reg[0:2**UART_FAW-2]),
-  //.data_in      (uart_rx_array_r[0:2**UART_FAW-2]),
-    .data_in      (uart_rx_array_r),
-    
-  //.frm_type     (dl_fec_frm_type),
-    .msg_len      (dl_msg_len),
-    .msg_tag      (dl_fec_msg_tag),
-    
-    .crc0_start   (dl_fec_crc0_start),
-    .enc0_done    (dl_fec_enc0_done),
-    .crc0_data_out(dl_fec_crc0_data),
-    .enc0_row_p   (dl_fec_enc0_row_p),
-    .enc0_col_p   (dl_fec_enc0_col_p),
-    
-    .crc1_start   (dl_fec_crc1_start),
-    .enc1_done    (dl_fec_enc1_done),
-    .crc1_data_out(dl_fec_crc1_data),
-    .enc1_row_p   (dl_fec_enc1_row_p),
-    .enc1_col_p   (dl_fec_enc1_col_p)
+    .clk                  (clk),
+    .rst_n                (rst_n),
+    .data_in              (uart_rx_array_r),
+    .msg_len              (dl_msg_len),
+    .msg_tag              (dl_fec_msg_tag),
+    .crc0_start           (dl_fec_crc0_start),
+    .enc0_done            (dl_fec_enc0_done),
+    .crc0_data_out        (dl_fec_crc0_data),
+    .enc0_row_p           (dl_fec_enc0_row_p),
+    .enc0_col_p           (dl_fec_enc0_col_p),
+    .crc1_start           (dl_fec_crc1_start),
+    .enc1_done            (dl_fec_enc1_done),
+    .crc1_data_out        (dl_fec_crc1_data),
+    .enc1_row_p           (dl_fec_enc1_row_p),
+    .enc1_col_p           (dl_fec_enc1_col_p)
   );
   
   // ========= Downlink controller =========
+  
   dl_controller #(
     .SERIAL_DIV_WIDTH  (SERIAL_DIV_WIDTH)
   ) dl_ctrl_u (
     .clk                  (clk),
     .rst_n                (rst_n),
-  //.data_in              (uart_rx_array_r[2**UART_FAW-2:0]),
     .data_in              (uart_rx_array_r),
     .msg_tag              (dl_fec_msg_tag),
     .msg_len              (dl_msg_len),
     .enc_used             (dl_ctrl_enc_used[0]),
-    
     .dl_start             (dl_ctrl_start),
     .dl_done              (dl_ctrl_done),
     .dl_out               (dl_out),
     .dl_en                (dl_en),
-     
     .crc0_data            (dl_fec_crc0_data),
     .enc0_row_p           (dl_fec_enc0_row_p),
     .enc0_col_p           (dl_fec_enc0_col_p),
-     
     .crc1_data            (dl_fec_crc1_data),
     .enc1_row_p           (dl_fec_enc1_row_p),
     .enc1_col_p           (dl_fec_enc1_col_p),
-    
     .ser_clk_div          (dl_ctrl_clk_div),
     .err_inj_mask_0       (dl_err_inj_mask_0),
     .err_inj_mask_1       (dl_err_inj_mask_1),
@@ -345,15 +334,62 @@ module fec_top(
     .err_inj_enable_clear (dl_err_inj_enable_clear)
    );
   
-  // ========== UL FEC Engine =========
+  // =========================================================
+  // =                 Uplink data path                      =
+  // =========================================================
+  logic                                 ul_fec_enc_used;
+  logic                                 ul_fec_enc0_start;
+  logic [ENC0_DATA_WIDTH-1:0][ENC0_DATA_DEPTH-1:0] ul_fec_enc0_data_cor;
+  logic                                 ul_fec_enc0_err_det;
+  logic                                 ul_fec_enc0_err_cor;
+  logic                                 ul_fec_crc0_done;
+  logic                                 ul_fec_crc0_valid;
+  logic                                 ul_fec_enc1_start;
+  logic [ENC1_DATA_WIDTH-1:0][ENC1_DATA_DEPTH-1:0] ul_fec_enc1_data_cor;
+  logic                                 ul_fec_enc1_err_det;
+  logic                                 ul_fec_enc1_err_cor;
+  logic                                 ul_fec_crc1_done;
+  logic                                 ul_fec_crc1_valid;
+  logic                                 ul_fec_uncor_err;
+  logic                                 ul_mon_enc_used;
+  logic                                 ul_mon_done;
+  logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] ul_mon_data_out;
+  logic [CRC0_WIDTH-1:0]                ul_mon_crc0_data;
+  logic [ENC0_DATA_DEPTH-1:0]           ul_mon_cenc0_row_p;
+  logic [ENC0_DATA_WIDTH-1:0]           ul_mon_cenc0_col_p;
+  logic [CRC1_WIDTH-1:0]                ul_mon_crc1_data;
+  logic [ENC1_DATA_DEPTH-1:0]           ul_mon_enc1_row_p;
+  logic [ENC1_DATA_WIDTH-1:0]           ul_mon_enc1_col_p;
+  logic [7:0]                           ul_mon_msg_cnt;
   
-  logic       ul_fec_done;
-  logic [7:0] ul_fec_msg_len;
-  logic       ul_fec_uncor_err;
-  // Tie off signals for now
-  assign ul_fec_done       = 1'b1;
-  assign ul_fec_msg_len    = 8'd8;
-  assign ul_fec_uncor_err  = 1'b0;
+  
+  // ====== UL FEC Control FSM  =======
+
+  ul_fec_fsm ul_fec_fsm_u (
+    .clk                  (clk),
+    .rst_n                (rst_n),
+    .uart_tx_level        (uart_tx_level),
+    .ul_uart_tx_wr        (ul_uart_tx_wr),
+    .ul_uart_tx_wdata     (ul_uart_tx_wdata),
+    .ul_uart_tx_grant     (ul_uart_tx_grant),
+    .ul_uart_tx_req       (ul_uart_tx_req),
+    //.ul_mon_msg_cnt       (ul_mon_msg_cnt),
+    .ul_mon_done          (ul_mon_done),
+    .ul_mon_enc_used      (ul_mon_enc_used),
+    .ul_fec_enc_used      (ul_fec_enc_used),
+    .ul_fec_enc0_start    (ul_fec_enc0_start),
+    .ul_fec_enc0_data_cor (ul_fec_enc0_data_cor),
+    .ul_fec_enc0_err_det  (ul_fec_enc0_err_det),
+    .ul_fec_enc0_err_cor  (ul_fec_enc0_err_cor),
+    .ul_fec_crc0_done     (ul_fec_crc0_done),
+    .ul_fec_crc0_valid    (ul_fec_crc0_valid),
+    .ul_fec_enc1_start    (ul_fec_enc1_start),
+    .ul_fec_enc1_data_cor (ul_fec_enc1_data_cor),
+    .ul_fec_enc1_err_det  (ul_fec_enc1_err_det),
+    .ul_fec_enc1_err_cor  (ul_fec_enc1_err_cor),
+    .ul_fec_crc1_done     (ul_fec_crc1_done),
+    .ul_fec_crc1_valid    (ul_fec_crc1_valid)
+  );
 
   // ========= Uplink monitor =========
 
@@ -364,9 +400,49 @@ module fec_top(
     .rst_n            (rst_n),
     .ul_in            (ul_in),
     .ul_en            (ul_en),
-    .ul_fec_done      (ul_fec_done),
-    .ul_fec_msg_len   (ul_fec_msg_len),
-    .ul_fec_uncor_err (ul_fec_uncor_err)
+    .msg_cnt          (ul_mon_msg_cnt),
+    .ul_fec_enc_used  (ul_fec_enc_used),
+    .ul_fec_done      (ul_fec_crc1_done),
+    .ul_fec_uncor_err (ul_fec_uncor_err),
+    .enc_used         (ul_mon_enc_used),
+    .done             (ul_mon_done),
+    .data_out         (ul_mon_data_out),
+    .crc0_data        (ul_mon_crc0_data),
+    .enc0_row_p       (ul_mon_cenc0_row_p),
+    .enc0_col_p       (ul_mon_cenc0_col_p),
+    .crc1_data        (ul_mon_crc1_data),
+    .enc1_row_p       (ul_mon_enc1_row_p),
+    .enc1_col_p       (ul_mon_enc1_col_p)
+  );
+
+  // ========== UL FEC Engine =========
+  
+  ul_fec_engine ul_fec_u (
+    .clk              (clk),
+    .rst_n            (rst_n),
+    .uncor_err        (ul_fec_uncor_err),
+    .enc_used         (ul_fec_enc_used),
+    .data_in          (ul_mon_data_out),
+
+    .enc0_start       (ul_fec_enc0_start),
+    .enc0_row_p       (ul_mon_cenc0_row_p),
+    .enc0_col_p       (ul_mon_cenc0_col_p),
+    .enc0_data_cor    (ul_fec_enc0_data_cor),
+    .enc0_err_det     (ul_fec_enc0_err_det),
+    .enc0_err_cor     (ul_fec_enc0_err_cor),
+    .crc0_data        (ul_mon_crc0_data),
+    .crc0_done        (ul_fec_crc0_done),
+    .crc0_valid       (ul_fec_crc0_valid),
+
+    .enc1_start       (ul_fec_enc1_start),
+    .enc1_row_p       (ul_mon_enc1_row_p),
+    .enc1_col_p       (ul_mon_enc1_col_p),
+    .enc1_data_cor    (ul_fec_enc1_data_cor),
+    .enc1_err_det     (ul_fec_enc1_err_det),
+    .enc1_err_cor     (ul_fec_enc1_err_cor),
+    .crc1_data        (ul_mon_crc1_data),
+    .crc1_done        (ul_fec_crc1_done),
+    .crc1_valid       (ul_fec_crc1_valid)
   );
 
 endmodule

@@ -14,17 +14,17 @@ module fec_tb;
     logic [3:0][3:0] data_out;
     logic err_det, err_corr, complete;
 
-  fec # (
+  cpc_fec # (
     .WIDTH       (DATA_WIDTH),
     .DEPTH       (DATA_DEPTH)
-  ) fec_i (
+  ) cpc_fec_u (
     .data_in          (data),
     .row_parity       (row_p),
     .col_parity       (col_p),
     .data_corrected   (data_out),
     .error_detected   (err_det),
-    .error_corrected  (err_corr),
-    .complete	      (complete)
+    .error_corrected  (err_corr)
+    // .complete	      (complete) // not used in cpc_fec
     );
   `TB_DUMP("fec.vcd", fec_tb, 0) 
   `TB_FINISH(100)
@@ -41,8 +41,8 @@ module fec_tb;
       
       if(err_det) begin
         $display("Bit coordenate to flip:");
-        $display("Row: %0d", fec_i.error_row);
-        $display("Col: %0d", fec_i.error_col);
+        $display("Row: %0d", cpc_fec_u.error_row);
+        $display("Col: %0d", cpc_fec_u.error_col);
       end
       
       $display("Data output matrix");
@@ -50,7 +50,7 @@ module fec_tb;
       for (int i = 0; i < 4; i++)
         $display("%0d| %b %b %b %b", i,data_out[i][3],data_out[i][2], data_out[i][1], data_out[i][0]);
       $display("Corrected error? %s", err_corr?"Yes":"No");
-      $display("Correction completed? %s", complete?"Yes":"No");
+      //$display("Correction completed? %s", complete?"Yes":"No");
       $display("\n");
       
       $finish;

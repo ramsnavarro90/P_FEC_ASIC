@@ -4,26 +4,26 @@
 import fec_pkg::*;
 
 module dl_fec_engine (
-  input  logic clk,
-  input  logic rst_n,
-  input  logic [2**UART_FAW-1:0][UART_MDW-1:0] data_in, // 8-bit vector x 7 items = 56 bits
-  input logic [7:0]          msg_len,
-  input logic [3:0]          msg_tag,
+  input  logic                        clk,
+  input  logic                        rst_n,
+  input  logic [2**UART_RX_FAW-1:0][UART_MDW-1:0] data_in, // 8-bit vector x 7 items = 56 bits
+  input  logic [7:0]                  msg_len,
+  input  logic [3:0]                  msg_tag,
   // 64-bit Encoding cluster
-  input  logic crc0_start,
-  output logic enc0_done,
-  output logic [CRC0_WIDTH-1:0]      crc0_data_out,
-  output logic [ENC0_DATA_DEPTH-1:0] enc0_row_p,
-  output logic [ENC0_DATA_WIDTH-1:0] enc0_col_p,
+  input  logic                        crc0_start,
+  output logic                        enc0_done,
+  output logic [CRC0_WIDTH-1:0]       crc0_data_out,
+  output logic [ENC0_DATA_DEPTH-1:0]  enc0_row_p,
+  output logic [ENC0_DATA_WIDTH-1:0]  enc0_col_p,
   // 16-bit Encoding cluster
-  input  logic crc1_start,
-  output logic enc1_done,
-  output logic [CRC1_WIDTH-1:0]      crc1_data_out,
-  output logic [ENC1_DATA_DEPTH-1:0] enc1_row_p,
-  output logic [ENC1_DATA_WIDTH-1:0] enc1_col_p
+  input  logic                        crc1_start,
+  output logic                        enc1_done,
+  output logic [CRC1_WIDTH-1:0]       crc1_data_out,
+  output logic [ENC1_DATA_DEPTH-1:0]  enc1_row_p,
+  output logic [ENC1_DATA_WIDTH-1:0]  enc1_col_p
   );
   
-  // CRC-8 + 64-bit Encoding cluster
+  // 64-bit Encoding cluster
   
   logic [CRC0_DATA_WIDTH-1:0] crc0_data_in;
   logic                       crc0_done;
@@ -76,7 +76,7 @@ module dl_fec_engine (
   );
   
   
-  // CRC-4 + 16-bit Encoding cluster
+  // 16-bit Encoding cluster
   
   logic [CRC1_DATA_WIDTH-1:0] crc1_data_in;
   logic                       crc1_done;

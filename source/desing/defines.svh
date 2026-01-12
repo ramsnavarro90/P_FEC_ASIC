@@ -5,13 +5,6 @@
   `define SYS_CLK_PERIOD         20
   `define SYS_CLK_EDGE           (`SYS_CLK_PERIOD/2)
   `define SYS_CLK_FREQ           (1e9/`SYS_CLK_PERIOD)
-// SPI (unsused)
-//   `define SPI_CLK_DIV            10
-//   `define SPI_CDW                8 // SPI The width of the clock divider used to generate the SPI clock.
-//   `define SPI_FAW                3 // SPI_Log2 of the FIFO depth.
-//   `define SPI_CPOL               0 // SPI Clock Polarity.
-//   `define SPI_CPHA               0 // SPI CLock Phase.
-
 
 package fec_pkg;
 
@@ -19,7 +12,8 @@ package fec_pkg;
   parameter int APB_ADDR_WIDTH         = 8;
 
   parameter int UART_MDW               = 8;
-  parameter int UART_FAW               = 4;
+  parameter int UART_TX_FAW            = 4; // Depth = 16
+  parameter int UART_RX_FAW            = 3; // Depth = 8
   parameter int UART_SC                = 8;
   parameter int UART_GFLEN             = 4;
   parameter int UART_PARITY_TYPE       = 1; // 000: None, 001: odd, 010: even, 100: Sticky 0, 101: Sticky 1
@@ -52,7 +46,7 @@ package fec_pkg;
                                                             ENC1_PAR_DATA_WIDTH + ENC1_DATA_DEPTH +     // Parity
                                                             CRC1_WIDTH;                                 // CRC
   // Serializer
-  parameter int                    SERIAL_CLK_DIV         = 7;
+  parameter int                    SERIAL_CLK_DIV         = 4;
   parameter int                    SERIAL_DIV_WIDTH       = 16; // Serializer clock div width
   parameter int                    SERIAL_DATA_WIDTH      = ENC0_PAR_DATA_WIDTH;
   parameter int                    SERIAL_DATA_DEPTH      = ENC0_PAR_DATA_DEPTH;
@@ -60,15 +54,32 @@ package fec_pkg;
   parameter int                    DL_PREAMBLE_COUNT      = 4;
 
   // Supported commands by the FEC module
+  // typedef enum bit [3:0] {
+  //   CMD_REG_READ     = 4'd0, // Register read
+  //   CMD_REG_WRITE    = 4'd1, // Register write
+  //   CMD_FEC_TX       = 4'd2, // Transmit data with DL FEC 
+  //   CMD_FEC_RX       = 4'd3, // Receive data with UL FEC
+  //   CMD_FEC_RS       = 4'd4,  // Receive transmission result
+  //   CMD_ERR_RS       = 4'd15 // Command error response
+  // } command_t;
+
   typedef enum bit [3:0] {
-    CMD_REG_READ     = 4'd0, // Register read
-    CMD_REG_WRITE    = 4'd1, // Register write
-    CMD_FEC_TX       = 4'd2, // Transmit data with DL FEC 
-    CMD_FEC_RX       = 4'd3, // Receive data with UL FEC
-    CMD_FEC_RS       = 4'd4,  // Receive transmission result
-    CMD_ERR_RS       = 4'd15 // Command error response
+    CMD_REG_READ    = 4'd0, // Register read (*1)
+    RSP_READ_RES    = 4'd1, // Register read result (*2)
+    CMD_REG_WRITE   = 4'd2, // Register write (*1)
+    RSP_WRITE_RES   = 4'd3, // Register write result (*2)
+    CMD_TX_MSG      = 4'd4, // Transmit data (with DL FEC Datapath) (*1)
+    RSP_TX_RES      = 4'd5, // Transmit data result (*2)
+    RX_MSG_ID       = 4'd6, // Receive Message ID (with UL FEC datapath) (*3)
+    RX_MSG_DATA     = 4'd7, // Receive Message data (with UL FEC datapath) (*3)
+    RSP_CMD_ERR     = 4'd15 // Command error response (*4)
   } command_t;
-  
+
+  // 1: Input commnads to FEC module
+  // 2: Response commands from FEC module
+  // 3: Message recepction from FEC module
+  // 4: Error response from a given commnand
+
   typedef enum bit {
     REG_READ  = 1'd0,
     REG_WRITE = 1'd1
@@ -83,7 +94,6 @@ package fec_pkg;
     REG_ADDR_UART_CTRL         = 8'h24,
     REG_ADDR_UART_CFG          = 8'h28    
   } reg_addr_t;
-
 
   typedef enum int {
     UART_NO_ERR = 0,
