@@ -126,14 +126,16 @@ module deserializer #(
 
   typedef enum logic [1:0] {
     S_IDLE         = 2'd0,
-    S_SAMPLE_SYNC         = 2'd1,
-    S_DESERIALIZE  = 2'd2
+    S_SAMPLE_SYNC  = 2'd1,
+    S_DESERIALIZE  = 2'd2,
+    S_OFF_SYNC     = 2'd3
   } state_t;
   state_t state;
 
   logic [DIV_WIDTH-1:0] clk_cnt, clk_div_i;
   logic [$clog2(DATA_WIDTH):0] width_r;
   logic [$clog2(DATA_DEPTH):0] depth_r;
+  logic deser_done;
 
   assign clk_div_i = clk_div-1'b1;
 
@@ -145,7 +147,8 @@ module deserializer #(
       case (state)
         S_IDLE:          state <= (start) ? S_SAMPLE_SYNC : S_IDLE;
         S_SAMPLE_SYNC:   state <= (clk_cnt == (clk_div_i>>1)) ? S_DESERIALIZE : S_SAMPLE_SYNC;
-        S_DESERIALIZE:   state <= (done)  ? S_IDLE : S_DESERIALIZE;
+        S_DESERIALIZE:   state <= (deser_done)  ? S_OFF_SYNC : S_DESERIALIZE;
+        S_OFF_SYNC:      state <= (clk_cnt == (clk_div_i>>1)) ? S_IDLE : S_OFF_SYNC;
         default:         state <= S_IDLE;
       endcase
     end
@@ -163,15 +166,17 @@ module deserializer #(
       bit_count     <= 'b0;
       sample_count  <= 'b0;
       done          <= 1'b0;
+      deser_done    <= 1'b0;
     end else begin
       case (state)
 
         S_IDLE: begin
           par_out       <= par_out;
           // par_out       <= 'b0;  zeroes or par_out ??
-          bit_count     <= 0;
-          sample_count  <= 0;
-          done          <= 0;
+          bit_count     <= 'b0;
+          sample_count  <= 'b0;
+          done          <= 1'b0;
+          deser_done    <= 1'b0;
           if(start) begin
             width_r   <= width;
             depth_r   <= depth;
@@ -200,8 +205,8 @@ module deserializer #(
               bit_count <= 'b0;
 
               if (sample_count == depth_r) begin
-                sample_count <= 'b0;
-                done         <= 1'b1;
+                sample_count  <= 'b0;
+                deser_done    <= 1'b1;
               end
               else
                 sample_count <= sample_count + 1'b1;
@@ -212,7 +217,18 @@ module deserializer #(
           end
           else
             clk_cnt <= clk_cnt + 1'b1;
-          
+        
+        end
+
+        S_OFF_SYNC: begin
+          deser_done <= 1'b0;
+          // Wait for half clock cycle to align sampling
+          if(clk_cnt == clk_div_i>>1) begin
+            clk_cnt <= 0;
+            done <= 1'b1;
+          end
+          else
+            clk_cnt <= clk_cnt + 1'b1;
         end
       endcase
     end

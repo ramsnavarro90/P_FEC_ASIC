@@ -33,6 +33,7 @@ module fec_top_tb;
   bit [SERIAL_DIV_WIDTH-1:0] ser_clk_div;
   string test;
   bit [7:0] payload;
+  bit [15:0] clk_div;
   
   fec_top fec_u (
     .clk      (clk),
@@ -95,6 +96,9 @@ module fec_top_tb;
 
     if($value$plusargs ("PAYLOAD=%0d", payload))
       $display ("[%0t][TB] Using payload %0d",$time ,payload);
+    
+    if($value$plusargs ("CLK_DIV=%0d", clk_div))
+      $display ("[%0t][TB] Using downlink clock division %0d (0x%0h)",$time ,clk_div, clk_div);
 
     $monitor("[%0t][TB] dl_fec_fsm.state: %s", $time, fec_u.dl_fec_fsm_u.state.name());
     //downlink_monitor(/*clk, fec_u.dl_out*/);
@@ -108,6 +112,7 @@ module fec_top_tb;
        "test_fec_tx_8_payload":        test_fec_data_tx(8);
        "test_fec_tx_max_payload":      test_fec_data_tx(255);
        "test_fec_tx_set_payload":      test_fec_data_tx(payload);
+       "test_fec_tx_set_clk_div":      test_fec_data_tx(payload, clk_div);
        "test_fec_tx_invalid_payload":  test_fec_data_tx_invalid_payloads();
        "test_fec_tx_boundary_payload": test_fec_data_tx_boundary_payloads();
        "test_fec_tx_err_inj_mask_0":   test_fec_data_tx_err_inj(64'hbab1_cafe_dead_beef, 7);
@@ -392,13 +397,19 @@ module fec_top_tb;
   // FEC data Transmission
   
     
-  task test_fec_data_tx(bit[7:0] msg_len);
+  task test_fec_data_tx(bit[7:0] msg_len, bit[15:0] clk_div=clk_div);
     static bit [3:0] msg_tag = $urandom_range(0, 15);
-    bit [7:0] rsp_cmd, rsp_tag, rsp_code;
+    bit [7:0] rsp_cmd, rsp_tag, rsp_code, rsp_addr;
     bit result;
     
     $display("[%0t][TB-TEST] ======= FEC data Transmission =======", $time);
     $display("[%0t][TB-TEST] ==== Payload: %0d bytes        ==", $time, msg_len);
+
+    // Setup clock divisor register
+    if(clk_div!=0) begin
+      fec_reg_write(REG_ADDR_DL_SER_CLK_DIV, clk_div, rsp_cmd, rsp_addr, rsp_code, 0);
+    end
+
     fec_data_transmit_rand(msg_len, msg_tag, rsp_cmd, rsp_tag, rsp_code);
     //@(negedge dl_en);
     //@(negedge dl_en);
@@ -410,7 +421,7 @@ module fec_top_tb;
       $error("[%0t][TB-TEST] FEC response command ID received mismatches. Actual: %0d Expected: %0d", $time, rsp_cmd, RSP_TX_RES);
       result = 1;
     end
-    // check for response tag
+    // Check for response tag
     if(rsp_tag==msg_tag)
       $display("[%0t][TB-TEST] FEC response tag received is as expeted: %0d.", $time, msg_tag);
     else begin
