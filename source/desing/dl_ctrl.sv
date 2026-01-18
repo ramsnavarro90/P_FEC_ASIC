@@ -8,35 +8,35 @@ import fec_pkg::*;
 module dl_controller #(
   parameter int SERIAL_DIV_WIDTH  = 8
 )(
-  input  logic clk,
-  input  logic rst_n,
-  input  logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] data_in,   // 56 bits
-  input  logic                enc_used,                   // 0 or 1 encoder selection
-  input  logic                dl_start,                   // start trigger
-  input  logic [7:0] msg_len,
-  input  logic [3:0] msg_tag,
-  input  logic [CRC0_WIDTH-1:0] crc0_data,
-  input  logic [CRC1_WIDTH-1:0] crc1_data,
-  input  logic [ENC0_DATA_DEPTH-1:0] enc0_row_p,
-  input  logic [ENC0_DATA_WIDTH-1:0] enc0_col_p,
-  input  logic [ENC1_DATA_DEPTH-1:0] enc1_row_p,
-  input  logic [ENC1_DATA_WIDTH-1:0] enc1_col_p,
+  input  logic                        clk,
+  input  logic                        rst_n,
+  input  logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] data_in,  // 56 bits
+  input  logic                        enc_used,             // 0 or 1 encoder selection
+  input  logic                        dl_start,             // start trigger
+  input  logic [7:0]                  msg_len,
+  input  logic [3:0]                  msg_tag,
+  input  logic [CRC0_WIDTH-1:0]       crc0_data,
+  input  logic [CRC1_WIDTH-1:0]       crc1_data,
+  input  logic [ENC0_DATA_DEPTH-1:0]  enc0_row_p,
+  input  logic [ENC0_DATA_WIDTH-1:0]  enc0_col_p,
+  input  logic [ENC1_DATA_DEPTH-1:0]  enc1_row_p,
+  input  logic [ENC1_DATA_WIDTH-1:0]  enc1_col_p,
   input  logic [SERIAL_DIV_WIDTH-1:0] ser_clk_div,
-  input  logic [31:0] err_inj_mask_0,
-  input  logic [31:0] err_inj_mask_1,
-  input  logic        err_inj_enable,
-  output logic        err_inj_enable_clear,   
-  output logic dl_done,
-  output logic dl_out,
-  output logic dl_en
+  input  logic [31:0]                 err_inj_mask_0,
+  input  logic [31:0]                 err_inj_mask_1,
+  input  logic                        err_inj_enable,
+  output logic                        err_inj_enable_clear,   
+  output logic                        dl_done,
+  output logic                        dl_out,
+  output logic                        dl_en
 );
   
   typedef enum logic [2:0] {
     S_IDLE             = 3'd0,
     S_TRAINING_START   = 3'd1,
     S_TRAINING         = 3'd2,
-    // S_SERIALIZER_START = 3'd3,
-    S_SERIALIZER       = 3'd4
+    S_SERIALIZER       = 3'd3,
+    S_TIME_OFF         = 3'd4
   } dl_state_t;
   
   dl_state_t dl_state, next_dl_state;
@@ -48,6 +48,7 @@ module dl_controller #(
   logic serial_start;
   logic serial_done;
   logic enc_used_r;
+  logic [SERIAL_DIV_WIDTH-1:0] clk_cnt;
   
   // Auto-clear signal for err inj
   assign err_inj_enable_clear = ~enc_used_r & serial_done;
@@ -92,17 +93,23 @@ module dl_controller #(
       S_SERIALIZER: begin
         if(serial_done)
           next_dl_state = S_IDLE;
+          //next_dl_state = S_TIME_OFF;
         else 
           next_dl_state = dl_state;
       end
-      
-      
-      
+
+      S_TIME_OFF: begin
+        if(clk_cnt == ser_clk_div)
+          next_dl_state = S_IDLE;
+        else 
+          next_dl_state = dl_state;
+      end
+         
     endcase
     
   end
     
-   // Output logic
+  // Output logic
   always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
       training_start  <= 'b0;
@@ -142,8 +149,17 @@ module dl_controller #(
         // end
         
         S_SERIALIZER: begin
-          training_start  <= 'b0;
-          serial_start    <= 'b0;
+          if(serial_done) begin
+            training_start  <= 'b1;
+            serial_start    <= 'b0;
+          end
+          else begin
+            training_start  <= 'b0;
+            serial_start    <= 'b0;
+          end
+        end
+
+        S_TIME_OFF: begin
         end
         
       endcase
@@ -155,7 +171,7 @@ module dl_controller #(
  // Output Mux
 
   always_comb begin :output_mux_u
-    //case(dl_state & next_dl_state)
+
     case(dl_state)
       S_IDLE: begin
         dl_out  = 'b0;
@@ -171,6 +187,11 @@ module dl_controller #(
         dl_out  = serial_out;
         dl_en   = 'b1;
         dl_done = 'b0;
+      end
+      S_TIME_OFF: begin
+        dl_out  = 1'b0;
+        dl_en   = 1'b0;
+        dl_done = 1'b0;
       end
       default: begin
         dl_out  = 'b0;
@@ -250,5 +271,20 @@ module dl_controller #(
     .serial_out  (serial_out),
     .done        (serial_done)
   );
+
+  // Time off counter
+  always_ff @(posedge clk or negedge rst_n) begin: timeout_cnt_u
+    if(!rst_n)
+      clk_cnt <= 'b0;
+    else begin
+      if(dl_state == S_TIME_OFF) begin
+        if(clk_cnt == ser_clk_div)
+          clk_cnt <= 'b0;
+        else
+          clk_cnt <= clk_cnt + 1'b1;
+      end
+    end
+  end
+  
 
 endmodule

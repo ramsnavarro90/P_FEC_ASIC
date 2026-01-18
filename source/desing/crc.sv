@@ -55,12 +55,12 @@ module crc_generator_seq #(
         else begin
             case (state)
                 S_IDLE: begin
+                    done        <= 1'b0;
                     if (start) begin
-                      $display("[%0t][DE-CRC-Gen] Data-in: 0x%0h ", $time, data_in);
+                        $display("[%0t][DE-CRC-Gen] Data-in: 0x%0h ", $time, data_in);
                         crc         <= SEED;
                         shift_reg   <= data_in;
                         bit_counter <= DATA_WIDTH;
-                        done        <= 1'b0;
                     end
                 end
 
@@ -145,12 +145,13 @@ module crc_verify_seq #(
         else begin
             case (state)
                 S_IDLE: begin
+                    done        <= 1'b0;
                     if (start) begin
                         shift_reg   <= data_crc_in;
                         crc         <= 'b0;
                         bit_counter <= (DATA_WIDTH+CRC_WIDTH);
                         crc_valid   <= 1'b0;
-                        done        <= 1'b0;
+                        // done        <= 1'b0;
                     end
                 end
 

@@ -234,7 +234,7 @@ module fec_top_tb;
     $display("[%0t][TB-TEST] == Total timeout errors: %0d  ==", $time, TO_ERR_NUM);
     
     for(int ii=1; ii<(TO_ERR_NUM+1); ii++) begin
-      uart_error  = $urandom_range(UART_RX_RTO_COMMAND, UART_RX_RTO_DATA);
+      uart_error  = uart_error_t'($urandom_range(UART_RX_RTO_COMMAND, UART_RX_RTO_DATA));
       data_lenght = $urandom_range(1, 30);
       
       $display("[%0t][TB-TEST] Timeout error count: %0d  ==", $time, ii);
@@ -282,7 +282,7 @@ module fec_top_tb;
     $display("[%0t][TB-TEST] == Commands count: %0d  ==", $time, CMDS_NUM);
     
     for(int ii=0; ii<CMDS_NUM; ii++) begin
-      command = $urandom_range(5,15); // use undefined command ids
+      command = command_t'($urandom_range(5,15)); // use undefined command ids
       fec_command_error(command, err_resp,  err_code);
       
       // Check for error response

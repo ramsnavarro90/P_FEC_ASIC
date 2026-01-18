@@ -53,15 +53,27 @@ package fec_pkg;
 
   parameter int                    DL_PREAMBLE_COUNT      = 4;
 
-  // Supported commands by the FEC module
-  // typedef enum bit [3:0] {
-  //   CMD_REG_READ     = 4'd0, // Register read
-  //   CMD_REG_WRITE    = 4'd1, // Register write
-  //   CMD_FEC_TX       = 4'd2, // Transmit data with DL FEC 
-  //   CMD_FEC_RX       = 4'd3, // Receive data with UL FEC
-  //   CMD_FEC_RS       = 4'd4,  // Receive transmission result
-  //   CMD_ERR_RS       = 4'd15 // Command error response
-  // } command_t;
+// UL FIFO
+  localparam int UART_RX_WIDTH  = (2**UART_RX_FAW-1)*(UART_MDW);
+  localparam int UL_FIFO_WIDTH  = UART_RX_WIDTH +    // Data
+                                  ENC0_DATA_WIDTH +  // Col Parity
+                                  ENC0_DATA_DEPTH +  // Row Parity
+                                  CRC0_WIDTH +       // CRC
+                                  1;                 // Sampling
+  localparam int UL_FIFO_FAW    = 4;                 // Depth = 16
+
+  localparam int COL_START      = 0;
+  localparam int COL0_END       = COL_START  + ENC0_DATA_WIDTH - 1;
+  localparam int COL1_END       = COL_START  + ENC1_DATA_WIDTH - 1;
+  localparam int ROW_START      = COL0_END   + 1;
+  localparam int ROW0_END       = ROW_START  + ENC0_DATA_DEPTH - 1;
+  localparam int ROW1_END       = ROW_START  + ENC1_DATA_DEPTH - 1;
+  localparam int CRC_START      = ROW0_END   + 1;
+  localparam int CRC0_END       = CRC_START  + CRC0_WIDTH - 1;
+  localparam int CRC1_END       = CRC_START  + CRC1_WIDTH - 1;
+  localparam int DATA_START     = CRC0_END   + 1;
+  localparam int DATA_END       = DATA_START + UART_RX_WIDTH - 1;
+  localparam int SAMP_BIT       = UL_FIFO_WIDTH - 1;
 
   typedef enum bit [3:0] {
     CMD_REG_READ    = 4'd0, // Register read (*1)

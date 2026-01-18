@@ -54,7 +54,9 @@ module serializer #(
       par_in_r      <= 'b0;
       width_r       <= 'b0;
       depth_r       <= 'b0;
-    end else begin
+    end
+    else begin
+    
       case (state)
         S_IDLE: begin
           serial_out    <= 0;

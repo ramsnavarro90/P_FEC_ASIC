@@ -266,9 +266,9 @@ module dl_fec_fsm(
       
       S_MESSAGE_UART_TX_REQUEST: begin
         if(uart_tx_grant)
-		  next_state = S_MESSAGE_UART_TX_WRITE;
-		else
-		  next_state = state;
+		      next_state = S_MESSAGE_UART_TX_WRITE;
+		    else
+		      next_state = state;
       end
       
       S_MESSAGE_UART_TX_WRITE: begin
@@ -316,9 +316,9 @@ module dl_fec_fsm(
       
       S_REG_WRITE_TX_REQUEST: begin
         if(uart_tx_grant)
-		  next_state = S_REG_WRITE_TX_WRITE;
-		else
-		  next_state = state;
+		      next_state = S_REG_WRITE_TX_WRITE;
+		    else
+		      next_state = state;
       end
       
       S_REG_WRITE_TX_WRITE: begin
@@ -338,16 +338,16 @@ module dl_fec_fsm(
 	  
 	  S_REG_READ_TX_REQUEST: begin
 	    if(uart_tx_grant)
-		  next_state = S_REG_READ_TX_WRITE;
-		else
+		    next_state = S_REG_READ_TX_WRITE;
+		  else
 		  next_state = state;
 	  end
 	  
 	  S_REG_READ_TX_WRITE: begin
 	    if(uart_tx_level=='d4)
-          next_state = S_IDLE;
-        else
-          next_state = state;
+        next_state = S_IDLE;
+      else
+        next_state = state;
 	  end
 	        
     endcase
@@ -720,45 +720,48 @@ endmodule
 // ====== UL FEC Control FSM  =======
 
 module ul_fec_fsm(
-  input  logic                clk,
-  input  logic                rst_n,
+  input  logic                    clk,
+  input  logic                    rst_n,
   // UART TX Control
-  input  logic [UART_TX_FAW-1:0] uart_tx_level,
-  output logic                ul_uart_tx_wr,
-  output logic [UART_MDW-1:0] ul_uart_tx_wdata,
-  input  logic                ul_uart_tx_grant,
-  output logic                ul_uart_tx_req,
+  input  logic [UART_TX_FAW-1:0]  uart_tx_level,
+  output logic                    ul_uart_tx_wr,
+  output logic [UART_MDW-1:0]     ul_uart_tx_wdata,
+  input  logic                    ul_uart_tx_grant,
+  output logic                    ul_uart_tx_req,
   // Inputs from Uplink monitor
-  //input  logic [7:0]          ul_mon_msg_len,
-  input  logic                ul_mon_done,
-  input  logic                ul_mon_enc_used,
+  // input  logic                ul_mon_done,
+  output logic                    ul_fsm_msg_done,
+  input  logic                    ul_mon_enc_used,
+  output logic                    ul_mon_data_rd,
+  input  logic [UL_FIFO_FAW-1:0]  ul_mon_data_level,
   // Outputs to UL FEC Engine
-  output logic                ul_fec_enc_used,
+  output logic                    ul_fec_enc_used,
 
-  output logic                ul_fec_enc0_start,
+  output logic                    ul_fec_enc0_start,
   input  logic [ENC0_DATA_WIDTH-1:0][ENC0_DATA_DEPTH-1:0] ul_fec_enc0_data_cor,
-  input  logic                ul_fec_enc0_err_det,
-  input  logic                ul_fec_enc0_err_cor,
-  input  logic                ul_fec_crc0_done,
-  input  logic                ul_fec_crc0_valid,
+  input  logic                    ul_fec_enc0_err_det,
+  input  logic                    ul_fec_enc0_err_cor,
+  input  logic                    ul_fec_crc0_done,
+  input  logic                    ul_fec_crc0_valid,
 
-  output logic                ul_fec_enc1_start,
+  output logic                    ul_fec_enc1_start,
   input  logic [ENC1_DATA_WIDTH-1:0][ENC1_DATA_DEPTH-1:0] ul_fec_enc1_data_cor,
-  input  logic                ul_fec_enc1_err_det,
-  input  logic                ul_fec_enc1_err_cor,
-  input  logic                ul_fec_crc1_done,
-  input  logic                ul_fec_crc1_valid
+  input  logic                    ul_fec_enc1_err_det,
+  input  logic                    ul_fec_enc1_err_cor,
+  input  logic                    ul_fec_crc1_done,
+  input  logic                    ul_fec_crc1_valid
   );
 
-  typedef enum logic [2:0] {
-      S_IDLE                    = 3'd0,
-      S_UART_TX_REQUEST         = 3'd1,
-      S_FEC_CLUST1_START        = 3'd2,
-      S_FEC_CLUST1_DECODING     = 3'd3,
-      S_UART_TX_WRITE_MSG_ID    = 3'd4,
-      S_FEC_CLUST0_START        = 3'd5,
-      S_FEC_CLUST0_DECODING     = 3'd6,
-      S_UART_TX_WRITE_MSG_DATA  = 3'd7
+  typedef enum logic [3:0] {
+      S_IDLE                    = 4'd0,
+      S_READ_MON_DATA           = 4'd1,
+      S_UART_TX_REQUEST         = 4'd2,
+      S_FEC_CLUST1_START        = 4'd3,
+      S_FEC_CLUST1_DECODING     = 4'd4,
+      S_UART_TX_WRITE_MSG_ID    = 4'd5,
+      S_FEC_CLUST0_START        = 4'd6,
+      S_FEC_CLUST0_DECODING     = 4'd7,
+      S_UART_TX_WRITE_MSG_DATA  = 4'd8
   } state_fsm_ul_t;
   state_fsm_ul_t ul_state, next_ul_state;
 
@@ -773,6 +776,7 @@ module ul_fec_fsm(
   assign uart_tx_grant    = ul_uart_tx_grant;
   assign ul_uart_tx_req   = uart_tx_req;
   assign msg_cnt_p1       = msg_cnt + 1'b1;
+  assign ul_fsm_msg_done  = msg_done;
   
   // Current state logic
   always_ff @(posedge clk or negedge rst_n) begin
@@ -789,14 +793,22 @@ module ul_fec_fsm(
     case(ul_state)
 
       S_IDLE: begin
-        if(ul_mon_done) begin
-          if(ul_fec_enc_used)
-            next_ul_state = S_FEC_CLUST1_START;
-          else
+        
+        if(ul_mon_data_level > 'b0)
+          next_ul_state = S_READ_MON_DATA;
+        //  if(ul_mon_done) begin
+        //    if(ul_fec_enc_used)
+        //      next_ul_state = S_FEC_CLUST1_START;
+        //    else
+        //      next_ul_state = S_FEC_CLUST0_START;
+        // end
+      end
+
+      S_READ_MON_DATA: begin
+        if(!ul_fec_enc_used || !msg_done)
             next_ul_state = S_FEC_CLUST0_START;
-        end
-        // else
-        //   next_ul_state = next_ul_state;
+          else
+            next_ul_state = S_FEC_CLUST1_START;
       end
 
       S_UART_TX_REQUEST: begin
@@ -806,8 +818,6 @@ module ul_fec_fsm(
           else
             next_ul_state = S_UART_TX_WRITE_MSG_DATA;
         end
-        // else
-        //   next_ul_state = next_ul_state;
       end
       
       S_FEC_CLUST1_START: begin
@@ -817,15 +827,11 @@ module ul_fec_fsm(
       S_FEC_CLUST1_DECODING: begin
         if(ul_fec_crc1_done)
           next_ul_state = S_UART_TX_REQUEST;
-        // else
-        //   next_ul_state = next_ul_state;
       end
 
       S_UART_TX_WRITE_MSG_ID: begin
         if(uart_tx_level=='d4)
           next_ul_state = S_IDLE;
-        // else
-        //   next_ul_state = next_ul_state;
       end
       
       S_FEC_CLUST0_START: begin
@@ -835,15 +841,11 @@ module ul_fec_fsm(
       S_FEC_CLUST0_DECODING: begin
         if(ul_fec_crc0_done)
           next_ul_state = S_UART_TX_REQUEST;
-        // else
-        //   next_ul_state = next_ul_state;
       end
 
       S_UART_TX_WRITE_MSG_DATA: begin
         if(uart_tx_level=='d10)
           next_ul_state = S_IDLE;
-        // else
-        //   next_ul_state = next_ul_state;
       end
       
       default: begin
@@ -865,6 +867,7 @@ module ul_fec_fsm(
       msg_cnt           <= 8'b0;
       msg_len           <= 8'b0;
       msg_done          <= 1'b1; // Msg is done by default
+      ul_mon_data_rd    <= 1'b0;
     end
     else begin
         
@@ -880,6 +883,11 @@ module ul_fec_fsm(
           // msg_cnt           <= 8'b0;
           // msg_len           <= 8'b0;
           // msg_done          <= 1'b1; // Msg is done by default
+          ul_mon_data_rd    <= 1'b0;
+        end
+
+        S_READ_MON_DATA: begin
+          // ul_mon_data_rd    <= 1'b0;
         end
         
         S_UART_TX_REQUEST: begin
@@ -915,10 +923,12 @@ module ul_fec_fsm(
                               ul_fec_enc1_err_cor, // ERROR_CORRECTED
                               ul_fec_enc1_err_det, // ERROR_DETECTED
                               ~ul_fec_crc1_valid}; // CRC_ERROR
+            ul_mon_data_rd <= 1'b1;
           end
           else begin
-            uart_tx_wr    <= 1'b0;
-            uart_tx_wdata <= 'b0;
+            uart_tx_wr      <= 1'b0;
+            uart_tx_wdata   <= 8'b0;
+            ul_mon_data_rd  <= 1'b0;
           end
         end
         
@@ -975,7 +985,6 @@ module ul_fec_fsm(
             uart_tx_wr    <= 1'b1;
             uart_tx_wdata <= ul_fec_enc0_data_cor[6][7:0];
             msg_cnt       <= msg_cnt_p1;
-            msg_done      <= (msg_cnt_p1 >= msg_len)? 1'b1 : 1'b0;
           end
           else if(uart_tx_level=='d9 & uart_tx_wr==1'b0) begin  // Reception validation
             uart_tx_wr    <= 1'b1;
@@ -983,19 +992,23 @@ module ul_fec_fsm(
                               ul_fec_enc0_err_cor, // ERROR_CORRECTED
                               ul_fec_enc0_err_det, // ERROR_DETECTED
                               ~ul_fec_crc0_valid}; // CRC_ERROR
-            if(msg_done) begin
-              msg_cnt <= 8'b0;
-              msg_len <= 8'b0;
+            ul_mon_data_rd <= 1'b1;
+            if(msg_cnt >= msg_len) begin
+              msg_cnt   <= 8'b0;
+              msg_len   <= 8'b0;
+              msg_done  <= 1'b1;
             end
             else begin
-              msg_cnt <= msg_cnt;
-              msg_len <= msg_len;
+              msg_cnt   <= msg_cnt;
+              msg_len   <= msg_len;
+              msg_done  <= msg_done;
             end
 
           end
           else begin
-            uart_tx_wr    <= 1'b0;
-            uart_tx_wdata <= 8'b0;
+            uart_tx_wr      <= 1'b0;
+            uart_tx_wdata   <= 8'b0;
+            ul_mon_data_rd  <= 1'b0;
           end
         end
         

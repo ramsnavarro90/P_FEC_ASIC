@@ -2,7 +2,7 @@
 module encoder # (
     parameter int WIDTH = 4,
     parameter int DEPTH = 4
- )(
+)(
   input  logic                          clk,
   input  logic                          rst_n,
   input  logic [WIDTH-1:0][DEPTH-1:0]   data_in,
@@ -12,44 +12,71 @@ module encoder # (
   output logic                          done
 );
   
-  logic [DEPTH-1:0] row_parity_i;
-  logic [WIDTH-1:0] col_parity_i;
+  typedef enum logic {
+    S_IDLE      = 1'd0,
+    S_ENCODING  = 1'd1
+  } enc_st_t;
+  enc_st_t enc_st;
+
+  // logic [DEPTH-1:0] row_parity_i;
+  // logic [WIDTH-1:0] col_parity_i;
   
   // Register parity bits for signal propagation
   always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
-      row_parity <= 'b0;
-      col_parity <= 'b0;
-      done       <= 'b0;
-    end
-    else if(start) begin
-      row_parity <= row_parity_i;
-      col_parity <= col_parity_i;
-      done       <= 'b1;
+      // row_parity <= 'b0;
+      // col_parity <= 'b0;
+      enc_st     <= S_IDLE;
+      done       <= 1'b0;
     end
     else begin
-      row_parity <= row_parity;
-      col_parity <= col_parity;
-      done       <= 'b0;
-    end
-  end
-  
-  // Parity calc for rows
-    always_comb begin
-        for (int i = 0; i < DEPTH; i++) begin
-          row_parity_i[i] = ^data_in[i]; // XOR per fila
+      case(enc_st)
+        S_IDLE: begin
+          done      <= 1'b0;
+          if(start)
+            enc_st  <= S_ENCODING;
         end
+
+        S_ENCODING: begin
+          done        <= 1'b1;
+          enc_st      <= S_IDLE;
+        end
+
+      endcase
+
     end
 
-    // Parity calc for columns
-    always_comb begin
-        for (int j = 0; j < WIDTH; j++) begin
-            col_parity_i[j] = 1'b0;
-            for (int i = 0; i < DEPTH; i++) begin
-                col_parity_i[j] ^= data_in[i][j];
-            end
-        end
+    // else if(start) begin
+    //   row_parity <= row_parity_i;
+    //   col_parity <= col_parity_i;
+    //   done       <= 'b1;
+    // end
+    // else begin
+    //   row_parity <= row_parity;
+    //   col_parity <= col_parity;
+    //   done       <= 'b0;
+    // end
+  end
+  
+  // Parity calculation for rows
+  always_comb begin
+    for (int i = 0; i < DEPTH; i++) begin
+      row_parity[i] = ^data_in[i];
+      // row_parity_i[i] = ^data_in[i];
     end
+  end
+
+  // Parity calculation for columns
+  always_comb begin
+    for (int j = 0; j < WIDTH; j++) begin
+      //col_parity_i[j] = 1'b0;
+      col_parity[j] = 1'b0;
+      for (int i = 0; i < DEPTH; i++) begin
+        col_parity[j] ^= data_in[i][j];
+        // col_parity_i[j] ^= data_in[i][j];
+      end
+    end
+  end
   
 endmodule
 
@@ -140,7 +167,8 @@ module decoder #(
       error_detected_r2 <= 1'b0; 
       error_corrected_r <= 1'b0;
       error_corrected_r2<= 1'b0;
-    end else begin
+    end
+    else begin
       case(dec_st)
         
         // Wait for decode task
@@ -239,7 +267,7 @@ module cpc_fec  #(
   // Row parity calculation
   always_comb begin: row_parity_calc
     for (int i = 0; i < DEPTH; i++) begin
-      calc_row_parity[i] = ^data_in[i]; // XOR de cada fila
+      calc_row_parity[i] = ^data_in[i]; // XOR every row
     end
   end
 

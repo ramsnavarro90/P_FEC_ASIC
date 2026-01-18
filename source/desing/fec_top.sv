@@ -351,8 +351,11 @@ module fec_top(
   logic                                 ul_fec_crc1_done;
   logic                                 ul_fec_crc1_valid;
   logic                                 ul_fec_uncor_err;
+   // logic                                 ul_mon_done;
+  logic                                 ul_fsm_msg_done;
   logic                                 ul_mon_enc_used;
-  logic                                 ul_mon_done;
+  logic                                 ul_mon_data_rd;
+  logic [UL_FIFO_FAW-1:0]               ul_mon_data_level;
   logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] ul_mon_data_out;
   logic [CRC0_WIDTH-1:0]                ul_mon_crc0_data;
   logic [ENC0_DATA_DEPTH-1:0]           ul_mon_cenc0_row_p;
@@ -373,9 +376,11 @@ module fec_top(
     .ul_uart_tx_wdata     (ul_uart_tx_wdata),
     .ul_uart_tx_grant     (ul_uart_tx_grant),
     .ul_uart_tx_req       (ul_uart_tx_req),
-    //.ul_mon_msg_cnt       (ul_mon_msg_cnt),
-    .ul_mon_done          (ul_mon_done),
+    // .ul_mon_done          (ul_mon_done),
+    .ul_fsm_msg_done      (ul_fsm_msg_done),
     .ul_mon_enc_used      (ul_mon_enc_used),
+    .ul_mon_data_rd       (ul_mon_data_rd),
+    .ul_mon_data_level    (ul_mon_data_level),
     .ul_fec_enc_used      (ul_fec_enc_used),
     .ul_fec_enc0_start    (ul_fec_enc0_start),
     .ul_fec_enc0_data_cor (ul_fec_enc0_data_cor),
@@ -404,8 +409,11 @@ module fec_top(
     .ul_fec_enc_used  (ul_fec_enc_used),
     .ul_fec_done      (ul_fec_crc1_done),
     .ul_fec_uncor_err (ul_fec_uncor_err),
+    // .done             (ul_mon_done),
+    .msg_done         (ul_fsm_msg_done),
     .enc_used         (ul_mon_enc_used),
-    .done             (ul_mon_done),
+    .data_rd          (ul_mon_data_rd),
+    .data_level       (ul_mon_data_level),
     .data_out         (ul_mon_data_out),
     .crc0_data        (ul_mon_crc0_data),
     .enc0_row_p       (ul_mon_cenc0_row_p),
