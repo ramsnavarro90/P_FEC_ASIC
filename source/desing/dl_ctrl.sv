@@ -1,5 +1,4 @@
 `include "defines.svh"
-import fec_pkg::*;
 //`include "deser.sv"
 //`include "rf_pkt.sv"
 //`include "training.sv"

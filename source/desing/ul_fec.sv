@@ -1,7 +1,6 @@
 `include "defines.svh"
 //`include "crc.sv"
 //`include "fec.sv"
-import fec_pkg::*;
 
 module ul_fec_engine (
   input  logic                                  clk,

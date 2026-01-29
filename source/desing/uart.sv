@@ -1,5 +1,4 @@
 //`include "ef_utils.v"
-import fec_pkg::*;
 `timescale			1ns/1ps
 //`default_nettype		none // Commented line to prevent Questasim error: (vlog-2892) Net type of 'clk' was not explicitly declared.
 

@@ -1,4 +1,3 @@
-import fec_pkg::*;
 
 module uplink_monitor #(
   parameter int SERIAL_DIV_WIDTH   = 8

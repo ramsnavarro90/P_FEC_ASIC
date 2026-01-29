@@ -2,7 +2,6 @@
 //`default_nettype  none // Commented line to prevent Questasim error: (vlog-2892) Net type of 'clk' was not explicitly declared.
 
 `include "defines.svh"
-import fec_pkg::*;
 //`include "fec_fsm.sv"
 //`include "dl_fec.sv"
 //`include "uart.sv"

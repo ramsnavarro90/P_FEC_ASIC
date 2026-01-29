@@ -1,4 +1,3 @@
-import fec_pkg::*;
 
 module packet_scramble #(
   parameter int DATA_WIDTH = 10,

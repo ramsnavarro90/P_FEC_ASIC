@@ -1,5 +1,3 @@
-import fec_pkg::*;
-
 // ====== DL FEC Control FSM  =======
 
 module dl_fec_fsm(
@@ -751,7 +749,7 @@ module ul_fec_fsm(
   input  logic                    ul_fec_crc1_done,
   input  logic                    ul_fec_crc1_valid
   );
-
+    
   typedef enum logic [3:0] {
       S_IDLE                    = 4'd0,
       S_READ_MON_DATA           = 4'd1,

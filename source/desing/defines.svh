@@ -6,8 +6,7 @@
   `define SYS_CLK_EDGE           (`SYS_CLK_PERIOD/2)
   `define SYS_CLK_FREQ           (1e9/`SYS_CLK_PERIOD)
 
-package fec_pkg;
-
+  // Global parameters and typedefs (previously in fec_pkg)
   parameter int APB_DATA_WIDTH         = 32;
   parameter int APB_ADDR_WIDTH         = 8;
 
@@ -116,8 +115,6 @@ package fec_pkg;
     UART_RX_RTO_DATA_BITS,
     UART_RX_FER
   } uart_error_t;
-
-endpackage
 
 `endif
 
