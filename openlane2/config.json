@@ -1,0 +1,22 @@
+{
+    "DESIGN_NAME": "fec_top",
+    "VERILOG_FILES": [
+        "dir::../source/desing/defines.svh",
+        "dir::../source/desing/crc.sv",
+        "dir::../source/desing/deser.sv",
+        "dir::../source/desing/ef_utils.v",
+        "dir::../source/desing/fec.sv",
+        "dir::../source/desing/fec_fsm.sv", 
+        "dir::../source/desing/reg_cfg.sv", 
+        "dir::../source/desing/packet.sv",
+        "dir::../source/desing/training.sv",
+        "dir::../source/desing/uart.sv",
+        "dir::../source/desing/dl_fec.sv",
+        "dir::../source/desing/dl_ctrl.sv",
+        "dir::../source/desing/ul_fec.sv",
+        "dir::../source/desing/ul_mon.sv",
+        "dir::../source/desing/fec_top.sv"],
+    "CLOCK_PERIOD": 25,
+    "CLOCK_PORT": "clk",
+    "FP_PIN_ORDER_CFG":"dir::pin_order.cfg"
+}
