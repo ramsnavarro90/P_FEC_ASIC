@@ -24,6 +24,11 @@ module crc_generator_seq #(
     logic [DATA_WIDTH-1:0]          shift_reg;
     logic [CRC_WIDTH-1:0]           crc;
     logic [$clog2(DATA_WIDTH+1):0]  bit_counter;
+    
+    // Combinational signals for loop computation
+    logic [DATA_WIDTH-1:0]          shift_reg_comb;
+    logic [CRC_WIDTH-1:0]           crc_comb;
+    logic [$clog2(DATA_WIDTH+1):0]  bit_counter_comb;
     logic                           feedback;
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -43,6 +48,25 @@ module crc_generator_seq #(
         endcase
     end
 
+    // Combinational loop to compute CRC shifts
+    always_comb begin
+        shift_reg_comb = shift_reg;
+        crc_comb = crc;
+        bit_counter_comb = bit_counter;
+        feedback = 1'b0;
+        
+        for (int i=0; i < XOR_OPS_PER_CYCLE; i++) begin
+            if (bit_counter_comb > 'b0) begin
+                feedback = shift_reg_comb[DATA_WIDTH-1] ^ crc_comb[CRC_WIDTH-1];
+                crc_comb = crc_comb << 1;
+                if (feedback)
+                    crc_comb = crc_comb ^ POLY[CRC_WIDTH-1:0];
+                shift_reg_comb = shift_reg_comb << 1;
+                bit_counter_comb = bit_counter_comb - 1'b1;
+            end
+        end
+    end
+
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             crc         <= SEED;
@@ -50,7 +74,6 @@ module crc_generator_seq #(
             bit_counter <=  'b0;
             done        <= 1'b0;
             crc_out     <=  'b0;
-            feedback    <= 1'b0;
         end
         else begin
             case (state)
@@ -65,17 +88,9 @@ module crc_generator_seq #(
                 end
 
                 S_CRC_CALC: begin
-                  
-                    for (int i=0; i < XOR_OPS_PER_CYCLE; i++) begin
-                        if (bit_counter > 'b0) begin
-                            feedback = shift_reg[DATA_WIDTH-1] ^ crc[CRC_WIDTH-1];
-                            crc = crc << 1;
-                            if (feedback)
-                                crc = crc ^ POLY[CRC_WIDTH-1:0];
-                            shift_reg   = shift_reg << 1;
-                            bit_counter = bit_counter - 1'b1;
-                        end
-                    end
+                    crc         <= crc_comb;
+                    shift_reg   <= shift_reg_comb;
+                    bit_counter <= bit_counter_comb;
                 end
 
                 S_RESULT: begin
@@ -115,6 +130,11 @@ module crc_verify_seq #(
     logic [DATA_WIDTH+CRC_WIDTH-1:0]            shift_reg;
     logic [CRC_WIDTH-1:0]                       crc;
     logic [$clog2(DATA_WIDTH+CRC_WIDTH+1):0]    bit_counter;
+
+    // Combinational signals for loop computation
+    logic [DATA_WIDTH+CRC_WIDTH-1:0]            shift_reg_comb;
+    logic [CRC_WIDTH-1:0]                       crc_comb;
+    logic [$clog2(DATA_WIDTH+CRC_WIDTH+1):0]    bit_counter_comb;
     logic                                       feedback;
 
     always_ff @(posedge clk or negedge rst_n) begin
@@ -133,14 +153,32 @@ module crc_verify_seq #(
         endcase
     end
 
-  always_ff @(posedge clk or negedge rst_n) begin
+    // Combinational loop to compute CRC shifts
+    always_comb begin
+        shift_reg_comb = shift_reg;
+        crc_comb = crc;
+        bit_counter_comb = bit_counter;
+        feedback = 1'b0;
+        
+        for (int i=0; i < XOR_OPS_PER_CYCLE; i++) begin
+            if (bit_counter_comb > 'b0) begin
+                feedback = shift_reg_comb[DATA_WIDTH+CRC_WIDTH-1] ^ crc_comb[CRC_WIDTH-1];
+                crc_comb = crc_comb << 1;
+                if (feedback)
+                    crc_comb = crc_comb ^ POLY[CRC_WIDTH-1:0];
+                shift_reg_comb = shift_reg_comb << 1;
+                bit_counter_comb = bit_counter_comb - 1'b1;
+            end
+        end
+    end
+
+    always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             crc         <= 'b0;
             shift_reg   <= 'b0;
             bit_counter <= 'b0;
             crc_valid   <= 1'b0;
             done        <= 1'b0;
-            feedback    <= 1'b0;
         end
         else begin
             case (state)
@@ -151,22 +189,13 @@ module crc_verify_seq #(
                         crc         <= 'b0;
                         bit_counter <= (DATA_WIDTH+CRC_WIDTH);
                         crc_valid   <= 1'b0;
-                        // done        <= 1'b0;
                     end
                 end
 
                 S_CRC_CALC: begin
-                    for (int i=0; i < XOR_OPS_PER_CYCLE; i++) begin
-                        if (bit_counter > 'b0) begin
-                            feedback = shift_reg[DATA_WIDTH+CRC_WIDTH-1] ^ crc[CRC_WIDTH-1];
-                            crc = crc << 1;
-                            if (feedback)
-                                crc = crc ^ POLY[CRC_WIDTH-1:0];
-                            shift_reg = shift_reg << 1;
-                            //bit_counter--;
-                            bit_counter = bit_counter - 1'b1;
-                        end
-                    end
+                    crc         <= crc_comb;
+                    shift_reg   <= shift_reg_comb;
+                    bit_counter <= bit_counter_comb;
                 end
 
                 S_RESULT: begin
