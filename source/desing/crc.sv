@@ -80,7 +80,7 @@ module crc_generator_seq #(
                 S_IDLE: begin
                     done        <= 1'b0;
                     if (start) begin
-                        $display("[%0t][DE-CRC-Gen] Data-in: 0x%0h ", $time, data_in);
+                        // $display("[%0t][DE-CRC-Gen] Data-in: 0x%0h ", $time, data_in);
                         crc         <= SEED;
                         shift_reg   <= data_in;
                         bit_counter <= DATA_WIDTH;
@@ -94,7 +94,7 @@ module crc_generator_seq #(
                 end
 
                 S_RESULT: begin
-                  $display("[%0t][DE-CRC-Gen] CRC-out: 0x%0h ", $time, crc);
+                //   $display("[%0t][DE-CRC-Gen] CRC-out: 0x%0h ", $time, crc);
                    crc_out  <= crc;
                    done     <= 1'b1;
                 end
