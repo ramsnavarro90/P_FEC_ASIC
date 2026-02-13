@@ -10,7 +10,7 @@
 
 `include "../desing/defines.svh"
 `include "../testbench/tb_macros.svh"
-import fec_pkg::*;
+//import fec_pkg::*;
 
 //`timescale 1ns/100ps
 `timescale 1ns/1ns

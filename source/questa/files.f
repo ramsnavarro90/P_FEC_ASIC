@@ -5,11 +5,13 @@
 ../desing/fec.sv
 ../desing/fec_fsm.sv
 ../desing/reg_cfg.sv
-../desing/rf_pkt.sv
+../desing/packet.sv
 ../desing/training.sv
 ../desing/uart.sv
 ../desing/dl_fec.sv
 ../desing/dl_ctrl.sv
+../desing/ul_fec.sv
+../desing/ul_mon.sv
 ../desing/fec_top.sv
-../testbench/tb_macros.sv
+../testbench/tb_macros.svh
 ../testbench/testbench.sv

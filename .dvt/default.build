@@ -1,0 +1,12 @@
++dvt_wavedrom_file_ext_add+wdjs
+
+//For more details about this directive please visit: https://eda.amiq.com/documentation/eclipse/sv/toc/build-config/including-other-argument-files.html
++dvt_init+ius.irun
+
++incdir+source/desing
++incdir+source/testbench
++incdir+source/questa
+
+
+-F source/questa/files.f
+-top fec_top_tb
