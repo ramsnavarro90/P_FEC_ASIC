@@ -51,14 +51,9 @@ module fec_top(
   logic [3:0]          uart_data_size;
   logic                uart_stop_bits_count;
   logic [2:0]          uart_parity_type;
-  //logic [3:0]          uart_txfifotr;
-  //logic [3:0]          uart_rxfifotr;
-  //logic [UART_MDW-1:0] uart_match_data;
   logic [5:0]          uart_timeout_bits;
   logic                uart_loopback_en;
   logic                uart_glitch_filter_en;
-  //logic                uart_tx_flush;
-  //logic                uart_rx_flush;
   logic                uart_rx_fifo_reg;
   logic                uart_tx_empty;
   logic                uart_tx_full;
@@ -153,11 +148,8 @@ module fec_top(
   assign uart_parity_type       = uart_cfg_reg[7:5];
   assign uart_stop_bits_count   = uart_cfg_reg[4];
   assign uart_data_size         = uart_cfg_reg[3:0]; 
-  //assign uart_match_data        = uart_match_data_reg[UART_MDW-1:0];
-  //assign uart_rxfifotr          = uart_rx_fifo_tr_reg[3:0];
   //assign uart_rx_flush          = uart_rx_flush_reg[0] | uart_rx_flush_fsm;
   assign uart_rx_flush          = uart_rx_flush_fsm;
-  //assign uart_txfifotr          = uart_tx_fifo_tr_reg[3:0];
   //assign uart_tx_flush          = uart_tx_flush_reg[0] | uart_tx_flush_fsm;
   //assign uart_tx_flush          = uart_tx_flush_fsm;
   assign uart_tx_flush          = 1'b0;
