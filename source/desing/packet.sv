@@ -1,3 +1,4 @@
+`include "defines.svh"
 
 module packet_scramble #(
   parameter int DATA_WIDTH = 10,

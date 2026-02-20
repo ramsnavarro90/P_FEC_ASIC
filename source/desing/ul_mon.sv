@@ -1,3 +1,4 @@
+`include "defines.svh"
 
 module uplink_monitor #(
   parameter int SERIAL_DIV_WIDTH   = 8

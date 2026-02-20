@@ -1,3 +1,4 @@
+`include "defines.svh"
 // ====== DL FEC Control FSM  =======
 
 module dl_fec_fsm(
