@@ -415,7 +415,7 @@ module fec_top(
     .clk              (clk),
     .rst_n            (rst_n),
     .uncor_err        (ul_fec_uncor_err),
-    .enc_used         (ul_fec_enc_used),
+    .enc_used         (ul_mon_enc_used),
     .data_in          (ul_mon_data_out),
 
     .enc0_start       (ul_fec_enc0_start),
