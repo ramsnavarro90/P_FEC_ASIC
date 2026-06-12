@@ -29,6 +29,8 @@ module fec_top_tb;
  
   bit [15:0]         uart_ps;
   int                uart_br;
+  int                uart_mon_file;
+  bit                uart_mon_enable;
   //bit [15:0]         uart_ps = (`SYS_CLK_FREQ / (uart_br * UART_SC))-1;
   bit [SERIAL_DIV_WIDTH-1:0] ser_clk_div;
   string test;
@@ -64,7 +66,7 @@ module fec_top_tb;
   `TB_CLK(clk, 10)
   `TB_SRSTN(rst_n, clk, 1)
   `TB_DUMP("fec_top_tb.vcd", fec_top_tb, 0) 
-  //`TB_FINISH(50_000)
+  `TB_FINISH(2002320)
   
   initial begin
     `TB_START
@@ -105,6 +107,18 @@ module fec_top_tb;
     
     uart_setup();
     dl_ctrl_setup();
+    uart_mon_enable = $test$plusargs("uart_mon");
+    if (uart_mon_enable) begin
+      uart_mon_file = $fopen("uart_mon.csv", "w");
+      if (uart_mon_file == 0)
+        $fatal("[%0t][TB] Cannot open uart_mon.csv", $time);
+      $fwrite(uart_mon_file, "time(ns), UART, Data Hex, Data decimal, Data ASCII\n");
+      fork
+        uart_monitor("TX", uart_tx);
+        uart_monitor("RX", uart_rx);
+      join_none
+      $display("[%0t][TB] UART monitor enabled, logging to uart_mon.csv", $time);
+    end
     `WAIT_CLK(clk, 5)
     
      case(test)
@@ -128,7 +142,7 @@ module fec_top_tb;
     
      `WAIT_CLK(clk, 50)
     $display("[%0t][TB] Finish simulation ", $time);
-    $finish;
+    //$finish;
     
   end
   
@@ -619,8 +633,9 @@ module fec_top_tb;
   
   task fec_data_transmit_rand(bit[7:0] msg_len, bit [3:0] msg_tag, output bit[7:0] rsp_cmd, output bit[7:0] rsp_tag, output bit[7:0] rsp_code, input int baudrate=uart_br);
     //bit [3:0] msg_tag = $urandom_range(0,15);
+    bit [7:0] clks_per_bit;
     $display("[%0t][TB-TASK] FEC Data transmit start. Message length: %0d, Tag: %0d", $time, msg_len, msg_tag);
-    
+    clks_per_bit = $ceil(1.0 / (baudrate * 1e-9));
     if(msg_len==0) begin
       $error("[%0t][TB-TASK] Message lenght must be greather than 0", $time);
       return;
@@ -642,6 +657,17 @@ module fec_top_tb;
       
       begin
         fec_data_transmit_dl_stream(msg_len);
+        wait(fec_u.dl_fec_fsm_u.state.name()=="S_IDLE");
+        fork
+          begin
+            wait(uart_tx == 1'b1);
+            repeat(8 * clks_per_bit) @(posedge clk);
+          end
+          begin
+            wait(uart_rx == 1'b1);
+            repeat(8 * clks_per_bit) @(posedge clk);
+          end
+        join
       end
     join
 
@@ -987,7 +1013,49 @@ module fec_top_tb;
     //force fec_u.uart_loopback_en      = 0; // Already in initial value
     //force fec_u.uart_glitch_filter_en = 0; // Already in initial value
   endtask;
-  
+
+  function string uart_mon_ascii(bit [7:0] data);
+    byte c;
+    if (data >= 8'h20 && data <= 8'h7e) begin
+      c = data;
+      return {c};
+    end
+    return "";
+  endfunction
+
+  task automatic uart_monitor(string direction, ref logic line);
+    bit [7:0] data;
+    bit       parity_bit;
+    int       clks_per_bit;
+    int       clks_to_mid_bit;
+    bit [15:0] pr;
+    int       i;
+    string    ascii;
+
+    forever begin
+      @(negedge line);
+      pr = fec_u.uart_prescaler;
+      clks_per_bit = UART_SC * (pr + 1);
+      clks_to_mid_bit = clks_per_bit / 2;
+      repeat(clks_to_mid_bit) @(posedge clk);
+      if (line !== 1'b0) begin
+        continue;
+      end
+      for (i = 0; i < 8; i++) begin
+        repeat(clks_per_bit) @(posedge clk);
+        data[i] = line;
+      end
+      if (UART_PARITY_TYPE != 0) begin
+        repeat(clks_per_bit) @(posedge clk);
+        parity_bit = line;
+      end
+      repeat(clks_per_bit) @(posedge clk);
+      ascii = uart_mon_ascii(data);
+      $fwrite(uart_mon_file, "%0t,%s,%02h,%0d,%s\n", $time, direction, data, data, ascii);
+      // Wait until the line returns to idle to avoid false retrigger
+      wait (line == 1'b1);
+    end
+  endtask;
     
   task dl_ctrl_setup();
     //force fec_u.dl_ctrl_clk_div  = ser_clk_div;
