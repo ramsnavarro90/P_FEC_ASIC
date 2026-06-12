@@ -51,13 +51,13 @@ module ul_fec_engine (
                           data_in[1][7:0],
                           data_in[0][7:0]};
 
-  assign crc0_data_in = { data_in[6][7:0],
-                          data_in[5][7:0],
-                          data_in[4][7:0],
-                          data_in[3][7:0],
-                          data_in[2][7:0],
-                          data_in[1][7:0],
-                          data_in[0][7:0],
+  assign crc0_data_in = { enc0_data_cor[6][7:0],
+                          enc0_data_cor[5][7:0],
+                          enc0_data_cor[4][7:0],
+                          enc0_data_cor[3][7:0],
+                          enc0_data_cor[2][7:0],
+                          enc0_data_cor[1][7:0],
+                          enc0_data_cor[0][7:0],
                           crc0_data};
 
   decoder #(
@@ -105,11 +105,15 @@ module ul_fec_engine (
                           data_in[1][3:0],
                           data_in[2][3:0]};
 
-  assign crc1_data_in = { data_in[0][3:0],
-                          data_in[1][3:0],
-                          data_in[2][3:0],
-                          crc1_data};
+   assign crc1_data_in = { data_in[0][3:0],
+                           data_in[1][3:0],
+                           data_in[2][3:0],
+                           crc1_data};
 
+  //assign crc1_data_in = { enc1_data_cor[0][3:0],
+  //                        enc1_data_cor[1][3:0],
+  //                        enc1_data_cor[2][3:0],
+  //                        crc1_data};
   decoder #(
     .WIDTH           (ENC1_DATA_WIDTH),
     .DEPTH           (ENC1_DATA_DEPTH)
