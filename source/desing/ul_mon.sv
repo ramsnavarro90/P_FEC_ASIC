@@ -380,7 +380,7 @@ fifo #(
   .rst_n          (rst_n),
   .rd             (fifo_rd),
   .wr             (fifo_wr),
-  .wdata          ({enc_used_i,             // Encoder used for frame (Msg ID, Msg data)
+  .wdata          ({enc_used_i && msg_done,             // Encoder used for frame (Msg ID, Msg data)
                     unscrambled_data_out, // Data from unscrambler
                     crc_data_mux,
                     enc_row_p_mux,
