@@ -32,10 +32,11 @@ module dl_controller #(
   
   typedef enum logic [2:0] {
     S_IDLE             = 3'd0,
-    S_TRAINING_START   = 3'd1,
-    S_TRAINING         = 3'd2,
-    S_SERIALIZER       = 3'd3,
-    S_TIME_OFF         = 3'd4
+    S_TRAINING_DELAY   = 3'd1,
+    S_TRAINING_START   = 3'd2,
+    S_TRAINING         = 3'd3,
+    S_SERIALIZER       = 3'd4,
+    S_TIME_OFF         = 3'd5
   } dl_state_t;
   
   dl_state_t dl_state, next_dl_state;
@@ -48,10 +49,27 @@ module dl_controller #(
   logic serial_done;
   logic enc_used_r;
   logic [SERIAL_DIV_WIDTH-1:0] clk_cnt;
+  logic [2:0] training_dly_cntr;
   
   // Auto-clear signal for err inj
   assign err_inj_enable_clear = ~enc_used_r & serial_done;
   
+  // Training delay counter
+  always_ff @(posedge clk or negedge rst_n) begin: training_dly_cnt_u
+    if(!rst_n)
+      training_dly_cntr <= 3'b0;
+    else begin
+      if(dl_state == S_TRAINING_DELAY) begin
+        if(training_dly_cntr == 3'd7)
+          training_dly_cntr <= 3'b0;
+        else
+          training_dly_cntr <= training_dly_cntr + 1'b1;
+      end
+      else
+        training_dly_cntr <= 3'b0;
+    end
+  end
+
   // Current state
   always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n)
@@ -68,6 +86,13 @@ module dl_controller #(
       
       S_IDLE: begin 
         if(dl_start)
+          next_dl_state = S_TRAINING_DELAY;
+        else
+          next_dl_state = dl_state;
+      end
+
+      S_TRAINING_DELAY: begin
+        if(training_dly_cntr == 3'd7)
           next_dl_state = S_TRAINING_START;
         else 
           next_dl_state = dl_state;
@@ -149,11 +174,9 @@ module dl_controller #(
         
         S_SERIALIZER: begin
           if(serial_done) begin
-            training_start  <= 'b1;
             serial_start    <= 'b0;
           end
           else begin
-            training_start  <= 'b0;
             serial_start    <= 'b0;
           end
         end
