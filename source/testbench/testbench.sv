@@ -66,7 +66,7 @@ module fec_top_tb;
   `TB_CLK(clk, 10)
   `TB_SRSTN(rst_n, clk, 1)
   `TB_DUMP("fec_top_tb.vcd", fec_top_tb, 0) 
-  `TB_FINISH(2002320)
+  //`TB_FINISH(1200000)
   
   initial begin
     `TB_START
@@ -112,7 +112,7 @@ module fec_top_tb;
       uart_mon_file = $fopen("uart_mon.csv", "w");
       if (uart_mon_file == 0)
         $fatal("[%0t][TB] Cannot open uart_mon.csv", $time);
-      $fwrite(uart_mon_file, "time(ns), UART, Data Hex, Data decimal, Data ASCII\n");
+      $fwrite(uart_mon_file, "time(ns), UART, Data Hex, Data decimal\n");
       fork
         uart_monitor("TX", uart_tx);
         uart_monitor("RX", uart_rx);
@@ -1014,15 +1014,6 @@ module fec_top_tb;
     //force fec_u.uart_glitch_filter_en = 0; // Already in initial value
   endtask;
 
-  function string uart_mon_ascii(bit [7:0] data);
-    byte c;
-    if (data >= 8'h20 && data <= 8'h7e) begin
-      c = data;
-      return {c};
-    end
-    return "";
-  endfunction
-
   task automatic uart_monitor(string direction, ref logic line);
     bit [7:0] data;
     bit       parity_bit;
@@ -1030,7 +1021,6 @@ module fec_top_tb;
     int       clks_to_mid_bit;
     bit [15:0] pr;
     int       i;
-    string    ascii;
 
     forever begin
       @(negedge line);
@@ -1050,8 +1040,7 @@ module fec_top_tb;
         parity_bit = line;
       end
       repeat(clks_per_bit) @(posedge clk);
-      ascii = uart_mon_ascii(data);
-      $fwrite(uart_mon_file, "%0t,%s,%02h,%0d,%s\n", $time, direction, data, data, ascii);
+      $fwrite(uart_mon_file, "%0t,%s,%02h,%0d\n", $time, direction, data, data);
       // Wait until the line returns to idle to avoid false retrigger
       wait (line == 1'b1);
     end
