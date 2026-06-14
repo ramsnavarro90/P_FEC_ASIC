@@ -40,53 +40,52 @@ add wave -noupdate -expand -group {EF UART} -label tx_level /fec_top_tb/fec_u/ua
 add wave -noupdate -expand -group {EF UART} -label rx_data /fec_top_tb/fec_u/uart_u/rx_data
 add wave -noupdate -expand -group {EF UART} -label rx_fifo_flush /fec_top_tb/fec_u/uart_u/rx_fifo_flush
 add wave -noupdate -expand -group {EF UART} -label rx_level /fec_top_tb/fec_u/uart_u/rx_level
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_fec_crc1_start /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_crc1_start
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_fec_enc1_done /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_enc1_done
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_fec_crc0_start /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_crc0_start
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_fec_enc0_done /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_enc0_done
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_ctrl_start /fec_top_tb/fec_u/dl_fec_fsm_u/dl_ctrl_start
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_ctrl_ser_en /fec_top_tb/fec_u/dl_fec_fsm_u/dl_ctrl_ser_en
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_ctrl_enc_used /fec_top_tb/fec_u/dl_fec_fsm_u/dl_ctrl_enc_used
-add wave -noupdate -expand -group {DL FEC FSM} -label state /fec_top_tb/fec_u/dl_fec_fsm_u/state
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_last_dly_cnt /fec_top_tb/fec_u/dl_fec_fsm_u/dl_last_dly_cnt
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_cmd /fec_top_tb/fec_u/dl_fec_fsm_u/dl_cmd
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_msg_len -radix unsigned /fec_top_tb/fec_u/dl_fec_fsm_u/dl_msg_len
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_msg_tag -radix unsigned /fec_top_tb/fec_u/dl_fec_fsm_u/dl_msg_tag
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_msg_cnt -radix unsigned /fec_top_tb/fec_u/dl_fec_fsm_u/dl_msg_cnt
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_reg_addr /fec_top_tb/fec_u/dl_fec_fsm_u/dl_reg_addr
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_reg_rdata /fec_top_tb/fec_u/dl_fec_fsm_u/dl_reg_rdata
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_txn_done /fec_top_tb/fec_u/dl_fec_fsm_u/dl_txn_done
-add wave -noupdate -expand -group {DL FEC FSM} -label dl_cmd_error /fec_top_tb/fec_u/dl_fec_fsm_u/dl_cmd_error
-add wave -noupdate -expand -group {DL FEC FSM} -group {DL UART TX} -label uart_fatal_errors /fec_top_tb/fec_u/dl_fec_fsm_u/uart_fatal_errors
-add wave -noupdate -expand -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_wr /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_wr
-add wave -noupdate -expand -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_wdata /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_wdata
-add wave -noupdate -expand -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_grant /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_grant
-add wave -noupdate -expand -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_req /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_req
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_rx_array /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_array
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_rx_array_0 /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_array_0
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_rx_level /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_level
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_rx_done /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_done
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_rx_fifo_flush /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_fifo_flush
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_rx_fifo_reg /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_fifo_reg
-add wave -noupdate -expand -group {DL FEC FSM} -group {UART Control} -label uart_tx_level /fec_top_tb/fec_u/dl_fec_fsm_u/uart_tx_level
+add wave -noupdate -group {DL FEC FSM} -label dl_fec_crc1_start /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_crc1_start
+add wave -noupdate -group {DL FEC FSM} -label dl_fec_enc1_done /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_enc1_done
+add wave -noupdate -group {DL FEC FSM} -label dl_fec_crc0_start /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_crc0_start
+add wave -noupdate -group {DL FEC FSM} -label dl_fec_enc0_done /fec_top_tb/fec_u/dl_fec_fsm_u/dl_fec_enc0_done
+add wave -noupdate -group {DL FEC FSM} -label dl_ctrl_start /fec_top_tb/fec_u/dl_fec_fsm_u/dl_ctrl_start
+add wave -noupdate -group {DL FEC FSM} -label dl_ctrl_ser_en /fec_top_tb/fec_u/dl_fec_fsm_u/dl_ctrl_ser_en
+add wave -noupdate -group {DL FEC FSM} -label dl_ctrl_enc_used /fec_top_tb/fec_u/dl_fec_fsm_u/dl_ctrl_enc_used
+add wave -noupdate -group {DL FEC FSM} -label state /fec_top_tb/fec_u/dl_fec_fsm_u/state
+add wave -noupdate -group {DL FEC FSM} -label dl_cmd /fec_top_tb/fec_u/dl_fec_fsm_u/dl_cmd
+add wave -noupdate -group {DL FEC FSM} -label dl_msg_len -radix unsigned /fec_top_tb/fec_u/dl_fec_fsm_u/dl_msg_len
+add wave -noupdate -group {DL FEC FSM} -label dl_msg_tag -radix unsigned /fec_top_tb/fec_u/dl_fec_fsm_u/dl_msg_tag
+add wave -noupdate -group {DL FEC FSM} -label dl_msg_cnt -radix unsigned /fec_top_tb/fec_u/dl_fec_fsm_u/dl_msg_cnt
+add wave -noupdate -group {DL FEC FSM} -label dl_reg_addr /fec_top_tb/fec_u/dl_fec_fsm_u/dl_reg_addr
+add wave -noupdate -group {DL FEC FSM} -label dl_reg_rdata /fec_top_tb/fec_u/dl_fec_fsm_u/dl_reg_rdata
+add wave -noupdate -group {DL FEC FSM} -label dl_txn_done /fec_top_tb/fec_u/dl_fec_fsm_u/dl_txn_done
+add wave -noupdate -group {DL FEC FSM} -label dl_cmd_error /fec_top_tb/fec_u/dl_fec_fsm_u/dl_cmd_error
+add wave -noupdate -group {DL FEC FSM} -group {DL UART TX} -label uart_fatal_errors /fec_top_tb/fec_u/dl_fec_fsm_u/uart_fatal_errors
+add wave -noupdate -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_wr /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_wr
+add wave -noupdate -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_wdata /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_wdata
+add wave -noupdate -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_grant /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_grant
+add wave -noupdate -group {DL FEC FSM} -group {DL UART TX} -label dl_uart_tx_req /fec_top_tb/fec_u/dl_fec_fsm_u/dl_uart_tx_req
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_rx_array /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_array
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_rx_array_0 /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_array_0
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_rx_level /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_level
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_rx_done /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_done
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_rx_fifo_flush /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_fifo_flush
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_rx_fifo_reg /fec_top_tb/fec_u/dl_fec_fsm_u/uart_rx_fifo_reg
+add wave -noupdate -group {DL FEC FSM} -group {UART Control} -label uart_tx_level /fec_top_tb/fec_u/dl_fec_fsm_u/uart_tx_level
 add wave -noupdate -group {DL FEC Engine} -label msg_tag -radix unsigned /fec_top_tb/fec_u/dl_fec_u/msg_tag
 add wave -noupdate -group {DL FEC Engine} -label msg_len -radix unsigned -childformat {{{/fec_top_tb/fec_u/dl_fec_u/msg_len[7]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[6]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[5]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[4]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[3]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[2]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[1]} -radix unsigned} {{/fec_top_tb/fec_u/dl_fec_u/msg_len[0]} -radix unsigned}} -subitemconfig {{/fec_top_tb/fec_u/dl_fec_u/msg_len[7]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[6]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[5]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[4]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[3]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[2]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[1]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/dl_fec_u/msg_len[0]} {-height 15 -radix unsigned}} /fec_top_tb/fec_u/dl_fec_u/msg_len
 add wave -noupdate -group {DL FEC Engine} -label data_in /fec_top_tb/fec_u/dl_fec_u/data_in
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label crc1_start /fec_top_tb/fec_u/dl_fec_u/crc1_start
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label crc1_done /fec_top_tb/fec_u/dl_fec_u/crc1_done
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label crc1_data_in /fec_top_tb/fec_u/dl_fec_u/crc1_data_in
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label crc /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/crc
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label shift_reg /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/shift_reg
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label bit_counter /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/bit_counter
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label feedback /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/feedback
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label crc1_data_out /fec_top_tb/fec_u/dl_fec_u/crc1_data_out
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group CRC1 -label crc1_state /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/state
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group Encoder1 -label enc1_data_in /fec_top_tb/fec_u/dl_fec_u/enc1_data_in
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group Encoder1 -label enc1_col_p /fec_top_tb/fec_u/dl_fec_u/enc1_col_p
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group Encoder1 -label enc1_row_p /fec_top_tb/fec_u/dl_fec_u/enc1_row_p
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group Encoder1 -label enc1_start /fec_top_tb/fec_u/dl_fec_u/encoder1_u/start
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group Encoder1 -label enc1_done /fec_top_tb/fec_u/dl_fec_u/enc1_done
-add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -expand -group Encoder1 -label enc1_st /fec_top_tb/fec_u/dl_fec_u/encoder1_u/enc_st
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label crc1_start /fec_top_tb/fec_u/dl_fec_u/crc1_start
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label crc1_done /fec_top_tb/fec_u/dl_fec_u/crc1_done
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label crc1_data_in /fec_top_tb/fec_u/dl_fec_u/crc1_data_in
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label crc /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/crc
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label shift_reg /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/shift_reg
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label bit_counter /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/bit_counter
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label feedback /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/feedback
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label crc1_data_out /fec_top_tb/fec_u/dl_fec_u/crc1_data_out
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group CRC1 -label crc1_state /fec_top_tb/fec_u/dl_fec_u/crc_gen1_u/state
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group Encoder1 -label enc1_data_in /fec_top_tb/fec_u/dl_fec_u/enc1_data_in
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group Encoder1 -label enc1_col_p /fec_top_tb/fec_u/dl_fec_u/enc1_col_p
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group Encoder1 -label enc1_row_p /fec_top_tb/fec_u/dl_fec_u/enc1_row_p
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group Encoder1 -label enc1_start /fec_top_tb/fec_u/dl_fec_u/encoder1_u/start
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group Encoder1 -label enc1_done /fec_top_tb/fec_u/dl_fec_u/enc1_done
+add wave -noupdate -group {DL FEC Engine} -group {16bit Enconding cluster} -group Encoder1 -label enc1_st /fec_top_tb/fec_u/dl_fec_u/encoder1_u/enc_st
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group CRC0 -label crc0_start /fec_top_tb/fec_u/dl_fec_u/crc0_start
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group CRC0 -label crc0_done /fec_top_tb/fec_u/dl_fec_u/crc0_done
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group CRC0 -label crc0_data_in /fec_top_tb/fec_u/dl_fec_u/crc0_data_in
@@ -95,11 +94,20 @@ add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label enc0_data_in /fec_top_tb/fec_u/dl_fec_u/enc0_data_in
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label enc0_col_p /fec_top_tb/fec_u/dl_fec_u/enc0_col_p
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label enc0_row_p /fec_top_tb/fec_u/dl_fec_u/enc0_row_p
+add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label start /fec_top_tb/fec_u/dl_fec_u/encoder0_u/start
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label enc0_done /fec_top_tb/fec_u/dl_fec_u/enc0_done
-add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label enc0_start /fec_top_tb/fec_u/dl_fec_u/encoder0_u/done
 add wave -noupdate -group {DL FEC Engine} -group {64bit Encoding cluster} -group Encoder0 -label enc0_st /fec_top_tb/fec_u/dl_fec_u/encoder0_u/enc_st
 add wave -noupdate -group {Downlink controller} -label dl_state /fec_top_tb/fec_u/dl_ctrl_u/dl_state
 add wave -noupdate -group {Downlink controller} -label enc_used_r /fec_top_tb/fec_u/dl_ctrl_u/enc_used_r
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label data_in /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/data_in
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label enc_used /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/enc_used
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label err_inj_mask /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/err_inj_mask
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label err_inj_enable /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/err_inj_enable
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label par_out /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/par_out
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label format0 /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/format0
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label format1 /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/format1
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label en /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/en
+add wave -noupdate -group {Downlink controller} -group {Packet Scrambler} -label mask /fec_top_tb/fec_u/dl_ctrl_u/packet_scramble_u/mask
 add wave -noupdate -group {Downlink controller} -group Serializer -label serial_out /fec_top_tb/fec_u/dl_ctrl_u/serial_out
 add wave -noupdate -group {Downlink controller} -group Serializer -label serial_start /fec_top_tb/fec_u/dl_ctrl_u/serial_start
 add wave -noupdate -group {Downlink controller} -group Serializer -label serial_done /fec_top_tb/fec_u/dl_ctrl_u/serial_done
@@ -122,57 +130,57 @@ add wave -noupdate -group {UL FEC FSM} -label msg_done /fec_top_tb/fec_u/ul_fec_
 add wave -noupdate -group {UL FEC FSM} -label msg_len -radix unsigned /fec_top_tb/fec_u/ul_fec_fsm_u/msg_len
 add wave -noupdate -group {UL FEC FSM} -label msg_cnt -radix unsigned /fec_top_tb/fec_u/ul_fec_fsm_u/msg_cnt
 add wave -noupdate -group {UL FEC FSM} -label ul_state /fec_top_tb/fec_u/ul_fec_fsm_u/ul_state
-add wave -noupdate -expand -group {Uplink monitor} -label ul_in /fec_top_tb/fec_u/ul_mon_u/ul_in
-add wave -noupdate -expand -group {Uplink monitor} -label ul_en /fec_top_tb/fec_u/ul_mon_u/ul_en
-add wave -noupdate -expand -group {Uplink monitor} -label ul_fec_done /fec_top_tb/fec_u/ul_mon_u/ul_fec_done
-add wave -noupdate -expand -group {Uplink monitor} -label ul_fec_uncor_err /fec_top_tb/fec_u/ul_mon_u/ul_fec_uncor_err
-add wave -noupdate -expand -group {Uplink monitor} -label ul_state /fec_top_tb/fec_u/ul_mon_u/ul_state
-add wave -noupdate -expand -group {Uplink monitor} -label sampling /fec_top_tb/fec_u/ul_mon_u/sampling
-add wave -noupdate -expand -group {Uplink monitor} -label enc_used_i /fec_top_tb/fec_u/ul_mon_u/enc_used_i
-add wave -noupdate -expand -group {Uplink monitor} -label msg_done /fec_top_tb/fec_u/ul_mon_u/msg_done
-add wave -noupdate -expand -group {Uplink monitor} -label msg_len -radix unsigned -childformat {{{/fec_top_tb/fec_u/ul_mon_u/msg_len[7]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[6]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[5]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[4]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[3]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[2]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[1]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[0]} -radix unsigned}} -subitemconfig {{/fec_top_tb/fec_u/ul_mon_u/msg_len[7]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[6]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[5]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[4]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[3]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[2]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[1]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[0]} {-height 15 -radix unsigned}} /fec_top_tb/fec_u/ul_mon_u/msg_len
-add wave -noupdate -expand -group {Uplink monitor} -label msg_cnt -radix unsigned /fec_top_tb/fec_u/ul_mon_u/msg_cnt
-add wave -noupdate -expand -group {Uplink monitor} -label uncor_err /fec_top_tb/fec_u/ul_mon_u/uncor_err
-add wave -noupdate -expand -group {Uplink monitor} -label data_out /fec_top_tb/fec_u/ul_mon_u/data_out
-add wave -noupdate -expand -group {Uplink monitor} -label data_rd /fec_top_tb/fec_u/ul_mon_u/data_rd
-add wave -noupdate -expand -group {Uplink monitor} -label {data_wr (fifo_wr)} /fec_top_tb/fec_u/ul_mon_u/fifo_wr
-add wave -noupdate -expand -group {Uplink monitor} -label data_level -radix unsigned /fec_top_tb/fec_u/ul_mon_u/data_level
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label fifo_rd /fec_top_tb/fec_u/ul_mon_u/fifo_rd
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label fifo_wr /fec_top_tb/fec_u/ul_mon_u/fifo_wr
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label fifo_out /fec_top_tb/fec_u/ul_mon_u/fifo_out
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label fifo_level /fec_top_tb/fec_u/ul_mon_u/fifo_level
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label unscrambled_data_out /fec_top_tb/fec_u/ul_mon_u/unscrambled_data_out
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label crc_data_mux /fec_top_tb/fec_u/ul_mon_u/crc_data_mux
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label enc_row_p_mux /fec_top_tb/fec_u/ul_mon_u/enc_row_p_mux
-add wave -noupdate -expand -group {Uplink monitor} -group {UL FIFO} -label enc_col_p_mux /fec_top_tb/fec_u/ul_mon_u/enc_col_p_mux
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label enc_used /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc_used
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label par_in /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/par_in
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label data_out /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/data_out
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label crc0_data /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/crc0_data
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label enc0_row_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc0_row_p
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label enc0_col_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc0_col_p
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label crc1_data /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/crc1_data
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label enc1_row_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc1_row_p
-add wave -noupdate -expand -group {Uplink monitor} -group {Packet unscramble} -label enc1_col_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc1_col_p
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_clk_div -radix unsigned /fec_top_tb/fec_u/ul_mon_u/training_detector_u/clk_div
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_start /fec_top_tb/fec_u/ul_mon_u/training_detector_u/start
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_done /fec_top_tb/fec_u/ul_mon_u/training_detector_u/done
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_state /fec_top_tb/fec_u/ul_mon_u/training_detector_u/state
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_negedge /fec_top_tb/fec_u/ul_mon_u/training_detector_u/training_negedge
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_negedge_count /fec_top_tb/fec_u/ul_mon_u/training_detector_u/training_negedge_count
-add wave -noupdate -expand -group {Uplink monitor} -expand -group {Training detector} -label training_clk_cnt -radix unsigned /fec_top_tb/fec_u/ul_mon_u/training_detector_u/clk_cnt
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_start /fec_top_tb/fec_u/ul_mon_u/deserializer_u/start
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_done /fec_top_tb/fec_u/ul_mon_u/deserializer_u/done
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_state /fec_top_tb/fec_u/ul_mon_u/deserializer_u/state
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_clk_div -radix unsigned /fec_top_tb/fec_u/ul_mon_u/deserializer_u/clk_div
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_width /fec_top_tb/fec_u/ul_mon_u/deserializer_u/width
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_depth /fec_top_tb/fec_u/ul_mon_u/deserializer_u/depth
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_par_out /fec_top_tb/fec_u/ul_mon_u/deserializer_u/par_out
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_bit_count /fec_top_tb/fec_u/ul_mon_u/deserializer_u/bit_count
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_sample_count /fec_top_tb/fec_u/ul_mon_u/deserializer_u/sample_count
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_clk_cnt /fec_top_tb/fec_u/ul_mon_u/deserializer_u/clk_cnt
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_width_r /fec_top_tb/fec_u/ul_mon_u/deserializer_u/width_r
-add wave -noupdate -expand -group {Uplink monitor} -group Deserializer -label deser_depth_r /fec_top_tb/fec_u/ul_mon_u/deserializer_u/depth_r
+add wave -noupdate -group {Uplink monitor} -label ul_in /fec_top_tb/fec_u/ul_mon_u/ul_in
+add wave -noupdate -group {Uplink monitor} -label ul_en /fec_top_tb/fec_u/ul_mon_u/ul_en
+add wave -noupdate -group {Uplink monitor} -label ul_fec_done /fec_top_tb/fec_u/ul_mon_u/ul_fec_done
+add wave -noupdate -group {Uplink monitor} -label ul_fec_uncor_err /fec_top_tb/fec_u/ul_mon_u/ul_fec_uncor_err
+add wave -noupdate -group {Uplink monitor} -label ul_state /fec_top_tb/fec_u/ul_mon_u/ul_state
+add wave -noupdate -group {Uplink monitor} -label sampling /fec_top_tb/fec_u/ul_mon_u/sampling
+add wave -noupdate -group {Uplink monitor} -label enc_used_i /fec_top_tb/fec_u/ul_mon_u/enc_used_i
+add wave -noupdate -group {Uplink monitor} -label msg_done /fec_top_tb/fec_u/ul_mon_u/msg_done
+add wave -noupdate -group {Uplink monitor} -label msg_len -radix unsigned -childformat {{{/fec_top_tb/fec_u/ul_mon_u/msg_len[7]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[6]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[5]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[4]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[3]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[2]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[1]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/msg_len[0]} -radix unsigned}} -subitemconfig {{/fec_top_tb/fec_u/ul_mon_u/msg_len[7]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[6]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[5]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[4]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[3]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[2]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[1]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/msg_len[0]} {-height 15 -radix unsigned}} /fec_top_tb/fec_u/ul_mon_u/msg_len
+add wave -noupdate -group {Uplink monitor} -label msg_cnt -radix unsigned /fec_top_tb/fec_u/ul_mon_u/msg_cnt
+add wave -noupdate -group {Uplink monitor} -label uncor_err /fec_top_tb/fec_u/ul_mon_u/uncor_err
+add wave -noupdate -group {Uplink monitor} -label data_out /fec_top_tb/fec_u/ul_mon_u/data_out
+add wave -noupdate -group {Uplink monitor} -label data_rd /fec_top_tb/fec_u/ul_mon_u/data_rd
+add wave -noupdate -group {Uplink monitor} -label {data_wr (fifo_wr)} /fec_top_tb/fec_u/ul_mon_u/fifo_wr
+add wave -noupdate -group {Uplink monitor} -label data_level -radix unsigned -childformat {{{/fec_top_tb/fec_u/ul_mon_u/data_level[3]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/data_level[2]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/data_level[1]} -radix unsigned} {{/fec_top_tb/fec_u/ul_mon_u/data_level[0]} -radix unsigned}} -subitemconfig {{/fec_top_tb/fec_u/ul_mon_u/data_level[3]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/data_level[2]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/data_level[1]} {-height 15 -radix unsigned} {/fec_top_tb/fec_u/ul_mon_u/data_level[0]} {-height 15 -radix unsigned}} /fec_top_tb/fec_u/ul_mon_u/data_level
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label fifo_rd /fec_top_tb/fec_u/ul_mon_u/fifo_rd
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label fifo_wr /fec_top_tb/fec_u/ul_mon_u/fifo_wr
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label fifo_out /fec_top_tb/fec_u/ul_mon_u/fifo_out
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label fifo_level /fec_top_tb/fec_u/ul_mon_u/fifo_level
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label unscrambled_data_out /fec_top_tb/fec_u/ul_mon_u/unscrambled_data_out
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label crc_data_mux /fec_top_tb/fec_u/ul_mon_u/crc_data_mux
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label enc_row_p_mux /fec_top_tb/fec_u/ul_mon_u/enc_row_p_mux
+add wave -noupdate -group {Uplink monitor} -group {UL FIFO} -label enc_col_p_mux /fec_top_tb/fec_u/ul_mon_u/enc_col_p_mux
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label enc_used /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc_used
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label par_in /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/par_in
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label data_out /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/data_out
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label crc0_data /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/crc0_data
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label enc0_row_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc0_row_p
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label enc0_col_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc0_col_p
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label crc1_data /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/crc1_data
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label enc1_row_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc1_row_p
+add wave -noupdate -group {Uplink monitor} -group {Packet unscramble} -label enc1_col_p /fec_top_tb/fec_u/ul_mon_u/ul_packet_unscramble_u/enc1_col_p
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_clk_div -radix unsigned /fec_top_tb/fec_u/ul_mon_u/training_detector_u/clk_div
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_start /fec_top_tb/fec_u/ul_mon_u/training_detector_u/start
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_done /fec_top_tb/fec_u/ul_mon_u/training_detector_u/done
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_state /fec_top_tb/fec_u/ul_mon_u/training_detector_u/state
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_negedge /fec_top_tb/fec_u/ul_mon_u/training_detector_u/training_negedge
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_negedge_count /fec_top_tb/fec_u/ul_mon_u/training_detector_u/training_negedge_count
+add wave -noupdate -group {Uplink monitor} -group {Training detector} -label training_clk_cnt -radix unsigned /fec_top_tb/fec_u/ul_mon_u/training_detector_u/clk_cnt
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_start /fec_top_tb/fec_u/ul_mon_u/deserializer_u/start
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_done /fec_top_tb/fec_u/ul_mon_u/deserializer_u/done
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_state /fec_top_tb/fec_u/ul_mon_u/deserializer_u/state
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_clk_div -radix unsigned /fec_top_tb/fec_u/ul_mon_u/deserializer_u/clk_div
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_width /fec_top_tb/fec_u/ul_mon_u/deserializer_u/width
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_depth /fec_top_tb/fec_u/ul_mon_u/deserializer_u/depth
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_par_out /fec_top_tb/fec_u/ul_mon_u/deserializer_u/par_out
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_bit_count /fec_top_tb/fec_u/ul_mon_u/deserializer_u/bit_count
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_sample_count /fec_top_tb/fec_u/ul_mon_u/deserializer_u/sample_count
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_clk_cnt /fec_top_tb/fec_u/ul_mon_u/deserializer_u/clk_cnt
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_width_r /fec_top_tb/fec_u/ul_mon_u/deserializer_u/width_r
+add wave -noupdate -group {Uplink monitor} -group Deserializer -label deser_depth_r /fec_top_tb/fec_u/ul_mon_u/deserializer_u/depth_r
 add wave -noupdate -group {UL FEC Engine} -label uncor_err /fec_top_tb/fec_u/ul_fec_u/uncor_err
 add wave -noupdate -group {UL FEC Engine} -label enc_used /fec_top_tb/fec_u/ul_fec_u/enc_used
 add wave -noupdate -group {UL FEC Engine} -label data_in /fec_top_tb/fec_u/ul_fec_u/data_in
@@ -197,25 +205,25 @@ add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group
 add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group Decoder1 -label enc1_data_cor /fec_top_tb/fec_u/ul_fec_u/enc1_data_cor
 add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group Decoder1 -label enc1_err_det /fec_top_tb/fec_u/ul_fec_u/enc1_err_det
 add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group Decoder1 -label enc1_err_cor /fec_top_tb/fec_u/ul_fec_u/enc1_err_cor
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label start /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/start
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label crc1_data /fec_top_tb/fec_u/ul_fec_u/crc1_data
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label state /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/state
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label data_crc_in /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/data_crc_in
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label shift_reg /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/shift_reg
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label bit_counter /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/bit_counter
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label feedback /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/feedback
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label crc /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/crc
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label crc1_valid /fec_top_tb/fec_u/ul_fec_u/crc1_valid
-add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -expand -group CRC1 -label crc1_done /fec_top_tb/fec_u/ul_fec_u/crc1_done
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label start /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/start
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label crc1_data /fec_top_tb/fec_u/ul_fec_u/crc1_data
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label state /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/state
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label data_crc_in /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/data_crc_in
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label shift_reg /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/shift_reg
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label bit_counter /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/bit_counter
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label feedback /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/feedback
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label crc /fec_top_tb/fec_u/ul_fec_u/crc_verify1_u/crc
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label crc1_valid /fec_top_tb/fec_u/ul_fec_u/crc1_valid
+add wave -noupdate -group {UL FEC Engine} -group {16bit Decoding cluster} -group CRC1 -label crc1_done /fec_top_tb/fec_u/ul_fec_u/crc1_done
 add wave -noupdate -group Testbench -label test /fec_top_tb/test
 add wave -noupdate -group Testbench -label payload -radix unsigned /fec_top_tb/payload
 add wave -noupdate -group Testbench -label uart_prescaler -radix unsigned /fec_top_tb/uart_ps
 add wave -noupdate -group Testbench -label uart_baudrate -radix unsigned /fec_top_tb/uart_br
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {2002186020 ps} 0} {{Cursor 2} {534800890 ps} 0}
-quietly wave cursor active 2
-configure wave -namecolwidth 234
-configure wave -valuecolwidth 135
+WaveRestoreCursors {{Cursor 2} {746052632 ps} 0}
+quietly wave cursor active 1
+configure wave -namecolwidth 210
+configure wave -valuecolwidth 142
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
 configure wave -snapdistance 10
@@ -228,4 +236,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {0 ps} {2102436 ns}
+WaveRestoreZoom {0 ps} {2100 us}
