@@ -25,11 +25,15 @@ module crc_generator_seq #(
     logic [CRC_WIDTH-1:0]           crc;
     logic [$clog2(DATA_WIDTH+1):0]  bit_counter;
     
-    // Combinational signals for loop computation
+    // Combinational signals for loop computation (unrolled stages)
     logic [DATA_WIDTH-1:0]          shift_reg_comb;
     logic [CRC_WIDTH-1:0]           crc_comb;
     logic [$clog2(DATA_WIDTH+1):0]  bit_counter_comb;
-    logic                           feedback;
+
+    // Stage arrays for generate-unroll (XOR_OPS_PER_CYCLE stages)
+    logic [DATA_WIDTH-1:0]          shift_stage [0:XOR_OPS_PER_CYCLE];
+    logic [CRC_WIDTH-1:0]           crc_stage   [0:XOR_OPS_PER_CYCLE];
+    logic [$clog2(DATA_WIDTH+1):0]  bc_stage    [0:XOR_OPS_PER_CYCLE];
 
     always_ff @(posedge clk or negedge rst_n) begin
       if (!rst_n)
@@ -48,24 +52,27 @@ module crc_generator_seq #(
         endcase
     end
 
-    // Combinational loop to compute CRC shifts
-    always_comb begin
-        shift_reg_comb = shift_reg;
-        crc_comb = crc;
-        bit_counter_comb = bit_counter;
-        feedback = 1'b0;
-        
-        for (int i=0; i < XOR_OPS_PER_CYCLE; i++) begin
-            if (bit_counter_comb > 'b0) begin
-                feedback = shift_reg_comb[DATA_WIDTH-1] ^ crc_comb[CRC_WIDTH-1];
-                crc_comb = crc_comb << 1;
-                if (feedback)
-                    crc_comb = crc_comb ^ POLY[CRC_WIDTH-1:0];
-                shift_reg_comb = shift_reg_comb << 1;
-                bit_counter_comb = bit_counter_comb - 1'b1;
-            end
-        end
-    end
+    // Initial stage (stage 0)
+    assign shift_stage[0] = shift_reg;
+    assign crc_stage[0]   = crc;
+    assign bc_stage[0]    = bit_counter;
+
+    // Generate combinational unrolled stages
+    genvar gi;
+    generate
+      for (gi = 0; gi < XOR_OPS_PER_CYCLE; gi = gi + 1) begin : gen_crc_stages
+        wire feedback = (bc_stage[gi] > 'b0) ? (shift_stage[gi][DATA_WIDTH-1] ^ crc_stage[gi][CRC_WIDTH-1]) : 1'b0;
+        wire [CRC_WIDTH-1:0] crc_shift = crc_stage[gi] << 1;
+        assign crc_stage[gi+1] = (bc_stage[gi] > 'b0) ? (crc_shift ^ (feedback ? POLY[CRC_WIDTH-1:0] : {CRC_WIDTH{1'b0}})) : crc_stage[gi];
+        assign shift_stage[gi+1] = (bc_stage[gi] > 'b0) ? (shift_stage[gi] << 1) : shift_stage[gi];
+        assign bc_stage[gi+1] = (bc_stage[gi] > 'b0) ? (bc_stage[gi] - 1'b1) : bc_stage[gi];
+      end
+    endgenerate
+
+    // Outputs from last stage
+    assign crc_comb         = crc_stage[XOR_OPS_PER_CYCLE];
+    assign shift_reg_comb   = shift_stage[XOR_OPS_PER_CYCLE];
+    assign bit_counter_comb = bc_stage[XOR_OPS_PER_CYCLE];
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
@@ -131,11 +138,15 @@ module crc_verify_seq #(
     logic [CRC_WIDTH-1:0]                       crc;
     logic [$clog2(DATA_WIDTH+CRC_WIDTH+1):0]    bit_counter;
 
-    // Combinational signals for loop computation
+    // Combinational signals for loop computation (unrolled stages)
     logic [DATA_WIDTH+CRC_WIDTH-1:0]            shift_reg_comb;
     logic [CRC_WIDTH-1:0]                       crc_comb;
     logic [$clog2(DATA_WIDTH+CRC_WIDTH+1):0]    bit_counter_comb;
-    logic                                       feedback;
+
+    // Stage arrays for generate-unroll (XOR_OPS_PER_CYCLE stages)
+    logic [DATA_WIDTH+CRC_WIDTH-1:0]            shift_stage_v [0:XOR_OPS_PER_CYCLE];
+    logic [CRC_WIDTH-1:0]                       crc_stage_v   [0:XOR_OPS_PER_CYCLE];
+    logic [$clog2(DATA_WIDTH+CRC_WIDTH+1):0]    bc_stage_v    [0:XOR_OPS_PER_CYCLE];
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n)
@@ -153,24 +164,27 @@ module crc_verify_seq #(
         endcase
     end
 
-    // Combinational loop to compute CRC shifts
-    always_comb begin
-        shift_reg_comb = shift_reg;
-        crc_comb = crc;
-        bit_counter_comb = bit_counter;
-        feedback = 1'b0;
-        
-        for (int i=0; i < XOR_OPS_PER_CYCLE; i++) begin
-            if (bit_counter_comb > 'b0) begin
-                feedback = shift_reg_comb[DATA_WIDTH+CRC_WIDTH-1] ^ crc_comb[CRC_WIDTH-1];
-                crc_comb = crc_comb << 1;
-                if (feedback)
-                    crc_comb = crc_comb ^ POLY[CRC_WIDTH-1:0];
-                shift_reg_comb = shift_reg_comb << 1;
-                bit_counter_comb = bit_counter_comb - 1'b1;
-            end
-        end
-    end
+    // Initial stage (stage 0)
+    assign shift_stage_v[0] = shift_reg;
+    assign crc_stage_v[0]   = crc;
+    assign bc_stage_v[0]    = bit_counter;
+
+    // Generate combinational unrolled stages
+    genvar gj;
+    generate
+      for (gj = 0; gj < XOR_OPS_PER_CYCLE; gj = gj + 1) begin : gen_crc_verify_stages
+        wire feedback_v = (bc_stage_v[gj] > 'b0) ? (shift_stage_v[gj][DATA_WIDTH+CRC_WIDTH-1] ^ crc_stage_v[gj][CRC_WIDTH-1]) : 1'b0;
+        wire [CRC_WIDTH-1:0] crc_shift_v = crc_stage_v[gj] << 1;
+        assign crc_stage_v[gj+1] = (bc_stage_v[gj] > 'b0) ? (crc_shift_v ^ (feedback_v ? POLY[CRC_WIDTH-1:0] : {CRC_WIDTH{1'b0}})) : crc_stage_v[gj];
+        assign shift_stage_v[gj+1] = (bc_stage_v[gj] > 'b0) ? (shift_stage_v[gj] << 1) : shift_stage_v[gj];
+        assign bc_stage_v[gj+1] = (bc_stage_v[gj] > 'b0) ? (bc_stage_v[gj] - 1'b1) : bc_stage_v[gj];
+      end
+    endgenerate
+
+    // Outputs from last stage
+    assign crc_comb         = crc_stage_v[XOR_OPS_PER_CYCLE];
+    assign shift_reg_comb   = shift_stage_v[XOR_OPS_PER_CYCLE];
+    assign bit_counter_comb = bc_stage_v[XOR_OPS_PER_CYCLE];
 
     always_ff @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
