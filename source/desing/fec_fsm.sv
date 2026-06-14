@@ -883,9 +883,11 @@ module ul_fec_fsm(
           // msg_len           <= 8'b0;
           // msg_done          <= 1'b1; // Msg is done by default
           ul_mon_data_rd    <= 1'b0;
+          msg_done <=(msg_cnt >= msg_len);
         end
 
         S_READ_MON_DATA: begin
+          msg_done <=(msg_cnt >= msg_len);
           // ul_mon_data_rd    <= 1'b0;
         end
         
