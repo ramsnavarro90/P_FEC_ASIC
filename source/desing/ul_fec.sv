@@ -97,15 +97,15 @@ module ul_fec_engine (
                           data_in[1][3:0],
                           data_in[2][3:0]};
 
-   assign crc1_data_in = { data_in[0][3:0],
-                           data_in[1][3:0],
-                           data_in[2][3:0],
-                           crc1_data};
+  assign crc1_data_in = { enc1_data_cor[2][3:0],
+                          enc1_data_cor[1][3:0],
+                          enc1_data_cor[0][3:0],
+                          enc1_data_cor[3][3:0]};
 
-  //assign crc1_data_in = { enc1_data_cor[0][3:0],
-  //                        enc1_data_cor[1][3:0],
-  //                        enc1_data_cor[2][3:0],
-  //                        crc1_data};
+  // Note: CRC verify expects {data_bits, crc_bits}. Use corrected enc1_data_cor rows,
+  // where row2/row1/row0 are msg_len/tag and row3 is the corrected CRC.
+  // The previous raw data_in/crc1_data mapping was incorrect for verification.
+
   decoder #(
     .WIDTH           (ENC1_DATA_WIDTH),
     .DEPTH           (ENC1_DATA_DEPTH)
