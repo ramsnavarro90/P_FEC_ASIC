@@ -58,25 +58,25 @@ module encoder # (
     // end
   end
   
-  // Parity calculation for rows
-  always_comb begin
-    for (int i = 0; i < DEPTH; i++) begin
-      row_parity[i] = ^data_in[i];
-      // row_parity_i[i] = ^data_in[i];
+  // Parity calculation for rows (generate assigns)
+  genvar ri;
+  generate
+    for (ri = 0; ri < DEPTH; ri = ri + 1) begin : gen_row_parity
+      assign row_parity[ri] = ^data_in[ri];
     end
-  end
+  endgenerate
 
-  // Parity calculation for columns
-  always_comb begin
-    for (int j = 0; j < WIDTH; j++) begin
-      //col_parity_i[j] = 1'b0;
-      col_parity[j] = 1'b0;
-      for (int i = 0; i < DEPTH; i++) begin
-        col_parity[j] ^= data_in[i][j];
-        // col_parity_i[j] ^= data_in[i][j];
+  // Parity calculation for columns (generate assigns)
+  genvar rj, ri2;
+  generate
+    for (rj = 0; rj < WIDTH; rj = rj + 1) begin : gen_col_parity
+      wire [DEPTH-1:0] col_bits;
+      for (ri2 = 0; ri2 < DEPTH; ri2 = ri2 + 1) begin : gen_col_bits
+        assign col_bits[ri2] = data_in[ri2][rj];
       end
+      assign col_parity[rj] = ^col_bits;
     end
-  end
+  endgenerate
   
 endmodule
 
@@ -264,22 +264,25 @@ module cpc_fec  #(
   logic [$clog2(DEPTH)-1:0]           error_row;
   logic [$clog2(WIDTH)-1:0]           error_col;
   
-  // Row parity calculation
-  always_comb begin: row_parity_calc
-    for (int i = 0; i < DEPTH; i++) begin
-      calc_row_parity[i] = ^data_in[i]; // XOR every row
+  // Row parity calculation (generate assigns)
+  genvar cri;
+  generate
+    for (cri = 0; cri < DEPTH; cri = cri + 1) begin : gen_calc_row_parity
+      assign calc_row_parity[cri] = ^data_in[cri];
     end
-  end
+  endgenerate
 
-  // Column parity calculation
-  always_comb begin: col_parity_calc
-    for (int j = 0; j < WIDTH; j++) begin
-      calc_col_parity[j] = 1'b0;
-      for (int i = 0; i < DEPTH; i++) begin
-        calc_col_parity[j] ^= data_in[i][j];
+  // Column parity calculation (generate assigns)
+  genvar crj, cri2;
+  generate
+    for (crj = 0; crj < WIDTH; crj = crj + 1) begin : gen_calc_col_parity
+      wire [DEPTH-1:0] calc_col_bits;
+      for (cri2 = 0; cri2 < DEPTH; cri2 = cri2 + 1) begin : gen_calc_col_bits
+        assign calc_col_bits[cri2] = data_in[cri2][crj];
       end
+      assign calc_col_parity[crj] = ^calc_col_bits;
     end
-  end
+  endgenerate
 
   // Total parity bit is the XOR of all row and column parities
   assign calc_total_parity = ^row_parity ^ ^col_parity;
