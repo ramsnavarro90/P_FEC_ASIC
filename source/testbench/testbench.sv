@@ -10,7 +10,6 @@
 
 `include "../desing/defines.svh"
 `include "../testbench/tb_macros.svh"
-//import fec_pkg::*;
 
 //`timescale 1ns/100ps
 `timescale 1ns/1ns
@@ -392,7 +391,6 @@ module fec_top_tb;
     static bit [6:0] msg_pkts = payload/7+1;
     static bit [3:0] msg_tag = $urandom_range(0, 15);
     bit [7:0] rsp_cmd, rsp_addr, rsp_code, rsp_tag;
-    //static bit [7:0] rsp_cmd, rsp_tag, rsp_code;
     
     $display("[%0t][TB-TEST] ====== Error Injection Mask =====", $time);
     $display("[%0t][TB-TEST] == Mask:        0x%0h       ==", $time, mask);
@@ -425,8 +423,6 @@ module fec_top_tb;
     end
 
     fec_data_transmit_rand(msg_len, msg_tag, rsp_cmd, rsp_tag, rsp_code);
-    //@(negedge dl_en);
-    //@(negedge dl_en);
     
     // Check for response command
     if(rsp_cmd==RSP_TX_RES) // command_t
@@ -670,17 +666,6 @@ module fec_top_tb;
         join
       end
     join
-
-    // uart_send_8b(CMD_TX_MSG);// 1: Command        : transmit (command_t)
-    // uart_send_8b(msg_len);   // 2: Message lenght : msg_len
-    // uart_send_8b(msg_tag);   // 3: Message Tag    : msg_tag
-    // repeat(msg_len) begin    // 4: Message data   : Random data
-    //   uart_send_8b($urandom_range(0,255));
-    // end
-    // fork
-    //   fec_data_transmit_uart_response(rsp_cmd, rsp_tag, rsp_code);
-    //   fec_data_transmit_dl_stream(msg_len);
-    // join
     
     $display("[%0t][TB-TASK] FEC Data transmit end. Tag: %0d", $time, msg_tag);
   endtask
