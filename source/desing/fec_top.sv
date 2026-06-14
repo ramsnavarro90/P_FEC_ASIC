@@ -221,7 +221,6 @@ module fec_top(
     else
       if(uart_rx_fifo_reg) begin
         uart_rx_array_r <= uart_rx_array_reg;
-        //$display("[%0t] uart_rx_array_reg registered", $time);
       end
       else
         uart_rx_array_r <= uart_rx_array_r;
@@ -358,7 +357,6 @@ module fec_top(
     .ul_uart_tx_wdata     (ul_uart_tx_wdata),
     .ul_uart_tx_grant     (ul_uart_tx_grant),
     .ul_uart_tx_req       (ul_uart_tx_req),
-    // .ul_mon_done          (ul_mon_done),
     .ul_fsm_msg_done      (ul_fsm_msg_done),
     .ul_mon_enc_used      (ul_mon_enc_used),
     .ul_mon_data_rd       (ul_mon_data_rd),
