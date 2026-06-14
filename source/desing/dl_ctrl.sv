@@ -104,20 +104,14 @@ module dl_controller #(
       
       S_TRAINING: begin
         if(training_done)
-          // next_dl_state = S_SERIALIZER_START;
           next_dl_state = S_SERIALIZER;
         else 
           next_dl_state = dl_state;
       end
-      
-      // S_SERIALIZER_START: begin
-      //   next_dl_state = S_SERIALIZER;
-      // end
-      
+
       S_SERIALIZER: begin
         if(serial_done)
           next_dl_state = S_IDLE;
-          //next_dl_state = S_TIME_OFF;
         else 
           next_dl_state = dl_state;
       end
@@ -128,7 +122,7 @@ module dl_controller #(
         else 
           next_dl_state = dl_state;
       end
-         
+
     endcase
     
   end

@@ -23,10 +23,7 @@ module uart_tx_arbiter (
     S_CLIENT_GRANTED_1
   } state_arb_t;
   state_arb_t state, next_state;
-  
-  //logic granted_client;
-  //logic grant_active;
-    
+      
   // Mux
   always_comb begin
           
@@ -535,119 +532,6 @@ module fifo #(parameter DW=8, AW=4)(
     assign level = level_reg;
   
 endmodule
-/*
-);
-
-    localparam  DEPTH = 2**AW;
-
-    //Internal Signal declarations
-    //reg [DW-1:0]  array_reg [DEPTH-1:0];
-    reg [AW-1:0]  w_ptr_reg;
-    reg [AW-1:0]  w_ptr_next;
-    reg [AW-1:0]  w_ptr_succ;
-    reg [AW-1:0]  r_ptr_reg;
-    reg [AW-1:0]  r_ptr_next;
-    reg [AW-1:0]  r_ptr_succ;
-
-    // Level
-    reg [AW-1:0] level_reg;
-    reg [AW-1:0] level_next;      
-    reg full_reg;
-    reg empty_reg;
-    reg full_next;
-    reg empty_next;
-
-    wire w_en;
-
-    always @ (posedge clk, negedge rst_n)
-      if(!rst_n) begin
-        for(int i=0; i<2**AW; i++)
-          array_reg[i] <= 'h0;
-      end else if(w_en) begin
-            array_reg[w_ptr_reg] <= wdata;
-      end else if(flush) begin
-        for(int i=0; i<2**AW; i++)
-          array_reg[i] <= 'h0;
-      end else
-        array_reg[w_ptr_reg] <= array_reg[w_ptr_reg];
-
-    assign rdata = array_reg[r_ptr_reg];   
-    assign w_en = wr & ~full_reg;           
-
-    //State Machine
-    always @ (posedge clk, negedge rst_n) begin 
-        if(!rst_n)
-            begin
-                w_ptr_reg <= 'b0;
-                r_ptr_reg <= 'b0;
-                full_reg  <= 1'b0;
-                empty_reg <= 1'b1;
-                level_reg <= 'd0;
-                
-            end
-        else if(flush)
-            begin
-                w_ptr_reg <= 'b0;
-                r_ptr_reg <= 'b0;
-                full_reg  <= 1'b0;
-                empty_reg <= 1'b1;
-                level_reg <= 'd0;
-                
-            end
-        else
-            begin
-                w_ptr_reg <= w_ptr_next;
-                r_ptr_reg <= r_ptr_next;
-                full_reg  <= full_next;
-                empty_reg <= empty_next;
-                level_reg <= level_next;
-            end
-    end
-
-    //Next State Logic
-    always @* begin
-        w_ptr_succ  =   w_ptr_reg + 1;
-        r_ptr_succ  =   r_ptr_reg + 1;
-        w_ptr_next  =   w_ptr_reg;
-        r_ptr_next  =   r_ptr_reg;
-        full_next   =   full_reg;
-        empty_next  =   empty_reg;
-        level_next  =   level_reg;
-
-        case({w_en,rd})
-            //2'b00: nop
-            2'b01: 
-                if(~empty_reg) begin
-                    r_ptr_next = r_ptr_succ;
-                    full_next = 1'b0;
-                    level_next = level_reg - 1;
-                    if (r_ptr_succ == w_ptr_reg)
-                        empty_next = 1'b1;
-                end
-            
-            2'b10: 
-                if(~full_reg) begin
-                    w_ptr_next = w_ptr_succ;
-                    empty_next = 1'b0;
-                    level_next = level_reg + 1;
-                    if (w_ptr_succ == r_ptr_reg)
-                        full_next = 1'b1;
-                end
-            
-            2'b11: begin
-                w_ptr_next = w_ptr_succ;
-                r_ptr_next = r_ptr_succ;
-            end
-        endcase
-    end
-
-    //Set Full and Empty
-    assign full = full_reg;
-    assign empty = empty_reg;
-    assign level = level_reg;
-  
-endmodule
-*/
 
 module BAUDGEN
 (
@@ -843,7 +727,6 @@ module UART_RX #(parameter NUM_SAMPLES = 16, MDW = 8)(
     assign      dout            =   data_reg /*>> (9-data_size)*/;
     assign      parity_error    =   p_error_reg & rx_done;
     assign      frame_error     =   f_error_next & rx_done;
-  //assign      frame_error     =   f_error_reg & rx_done;
     assign      break_flag      =   (brk == 0);
     assign      match_flag      =   (match_data == dout) & rx_done;
 
@@ -1017,102 +900,3 @@ module UART_TX #(parameter NUM_SAMPLES = 16, MDW = 8)(
     assign tx = tx_reg;
   
 endmodule
-
-
-// module uart_tx_arbiter #(
-//     parameter int CLIENTS = 2
-//   ) (
-//   input  logic                clk,
-//   input  logic                rst_n,
-//   input  logic                req       [CLIENTS-1:0],
-//   output logic                grant     [CLIENTS-1:0],
-//   input  logic [UART_MDW-1:0] wdata_in  [CLIENTS-1:0],
-//   input  logic                wr_in     [CLIENTS-1:0],
-//   output logic [UART_MDW-1:0] wdata_out,
-//   output logic                wr_out
-//   );
-  
-//   typedef enum logic [CLIENTS:0] {
-//     S_IDLE,
-//     S_CLIENT_[2]
-//   } state_arb_t;
-  
-//   state_arb_t state, next_state;
-  
-//   logic [$clog2(CLIENTS)-1:0] dispatch_queue [CLIENTS-1:0] ;
-//   logic [$clog2(CLIENTS)-1:0] dispatch_ptr;    // Write pointer for dispatch
-//   logic [$clog2(CLIENTS)-1:0] granted_client;
-//   logic grant_active;
-  
-//   assign granted_client = dispatch_queue[0];
-//   assign wdata_out      = (grant_active)? wdata_in[granted_client]: 'b0;
-//   assign wr_out         = (grant_active)? wr_in   [granted_client]: 'b0;
-  
-//   // Current state logic
-//   always_ff @(posedge clk or negedge rst_n) begin
-//     if(!rst_n)
-//       state <= S_IDLE;
-//     else
-//       state <= next_state;
-//   end
-  
-//   // Next state logic
-//   always_comb begin
-//     next_state = state;
-    
-//     case(state)
-      
-//       S_IDLE: begin 
-//         if(any_condition)
-//           next_state = S_CLIENT_0;
-//         else 
-//           next_state = state;
-//       end
-      
-//       // Use generate CLIENT_GRANT_N blocks
-//       S_CLIENT_0: begin
-//         //if(!req[0])
-//       end
-      
-//       S_CLIENT_1: begin
-        
-//       end
-//     endcase
-    
-//   end
-  
-//   // Output logic
-//   always_ff @(posedge clk or negedge rst_n) begin
-//     if(!rst_n) begin
-//       foreach(dispatch_queue[ii])
-//         dispatch_queue[ii] <= 'b0;
-//       dispatch_ptr     <= 'b0;
-//       grant_active     <= 'b0;
-      
-//     end
-//     else begin
-      
-//       case(state)
-//         S_IDLE: begin
-          
-//         end
-        
-//         S_CLIENT_0: begin
-          
-//         end
-      
-//         S_CLIENT_1: begin
-
-//         end
-        
-//         default: begin
-          
-//         end
-        
-//       endcase
-      
-//     end
-//   end
-  
-  
-// endmodule

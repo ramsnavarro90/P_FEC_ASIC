@@ -792,15 +792,8 @@ module ul_fec_fsm(
     case(ul_state)
 
       S_IDLE: begin
-        
         if(ul_mon_data_level > 'b0)
           next_ul_state = S_READ_MON_DATA;
-        //  if(ul_mon_done) begin
-        //    if(ul_fec_enc_used)
-        //      next_ul_state = S_FEC_CLUST1_START;
-        //    else
-        //      next_ul_state = S_FEC_CLUST0_START;
-        // end
       end
 
       S_READ_MON_DATA: begin
@@ -879,16 +872,12 @@ module ul_fec_fsm(
           uart_tx_req       <= 1'b0;
           uart_tx_wr        <= 1'b0;
           uart_tx_wdata     <= 8'b0;
-          // msg_cnt           <= 8'b0;
-          // msg_len           <= 8'b0;
-          // msg_done          <= 1'b1; // Msg is done by default
           ul_mon_data_rd    <= 1'b0;
           msg_done <=(msg_cnt >= msg_len);
         end
 
         S_READ_MON_DATA: begin
           msg_done <=(msg_cnt >= msg_len);
-          // ul_mon_data_rd    <= 1'b0;
         end
         
         S_UART_TX_REQUEST: begin

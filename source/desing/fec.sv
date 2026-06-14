@@ -17,15 +17,10 @@ module encoder # (
     S_ENCODING  = 1'd1
   } enc_st_t;
   enc_st_t enc_st;
-
-  // logic [DEPTH-1:0] row_parity_i;
-  // logic [WIDTH-1:0] col_parity_i;
   
   // Register parity bits for signal propagation
   always_ff @(posedge clk or negedge rst_n) begin
     if(!rst_n) begin
-      // row_parity <= 'b0;
-      // col_parity <= 'b0;
       enc_st     <= S_IDLE;
       done       <= 1'b0;
     end
@@ -46,16 +41,6 @@ module encoder # (
 
     end
 
-    // else if(start) begin
-    //   row_parity <= row_parity_i;
-    //   col_parity <= col_parity_i;
-    //   done       <= 'b1;
-    // end
-    // else begin
-    //   row_parity <= row_parity;
-    //   col_parity <= col_parity;
-    //   done       <= 'b0;
-    // end
   end
   
   // Parity calculation for rows (generate assigns)
@@ -291,7 +276,6 @@ module cpc_fec  #(
   logic row_error_found, col_error_found;
   assign row_error_found = (row_parity != calc_row_parity);
   assign col_error_found = (col_parity != calc_col_parity);
-  //assign error_detected  = row_error_found || col_error_found || (total_parity != calc_total_parity);
   assign error_detected  = row_error_found || col_error_found || (calc_total_parity);
 
   // Erronous bit detection and correction
@@ -320,7 +304,5 @@ module cpc_fec  #(
       error_corrected = 0;
     end
   end
-
-  //assign done = error_corrected ? ((row_parity==calc_row_parity) && (col_parity==calc_col_parity)) : 1'b0;
 
 endmodule

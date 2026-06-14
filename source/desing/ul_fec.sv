@@ -36,11 +36,7 @@ module ul_fec_engine (
 
   logic [ENC0_DATA_WIDTH-1:0][ENC0_DATA_DEPTH-1:0] enc0_data_in;
   logic enc0_done;
-  //logic [ENC0_DATA_WIDTH-1:0][ENC0_DATA_DEPTH-1:0] enc0_data_cor;
-  //logic enc0_err_det;
-  //logic enc0_err_cor;
   logic [CRC0_DATA_WIDTH+CRC0_DATA_WIDTH-1:0] crc0_data_in;
-  //logic crc0_valid;
   
   assign enc0_data_in = { crc0_data,
                           data_in[6][7:0],
@@ -94,11 +90,7 @@ module ul_fec_engine (
 
   logic [ENC1_DATA_WIDTH-1:0][ENC1_DATA_DEPTH-1:0] enc1_data_in;
   logic enc1_done;
-  // logic [ENC1_DATA_WIDTH-1:0][ENC1_DATA_DEPTH-1:0] enc1_data_cor;
-  // logic enc1_err_det;
-  // logic enc1_err_cor;
   logic [CRC1_DATA_WIDTH+CRC1_DATA_WIDTH-1:0] crc1_data_in;
-  //logic crc1_valid;
   
   assign enc1_data_in = { crc1_data, 
                           data_in[0][3:0],
@@ -144,7 +136,6 @@ module ul_fec_engine (
     .done               (crc1_done)
   );
 
-  //assign uncor_err = (enc_used) ? enc1_err_det && !enc1_err_cor : enc0_err_det && !enc0_err_cor;
   assign uncor_err = (enc_used) ? (enc1_err_det && !enc1_err_cor && crc1_valid) : (enc0_err_det && !enc0_err_cor && crc0_valid);
 
 endmodule

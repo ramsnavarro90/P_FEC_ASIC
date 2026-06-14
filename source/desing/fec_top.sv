@@ -148,10 +148,7 @@ module fec_top(
   assign uart_parity_type       = uart_cfg_reg[7:5];
   assign uart_stop_bits_count   = uart_cfg_reg[4];
   assign uart_data_size         = uart_cfg_reg[3:0]; 
-  //assign uart_rx_flush          = uart_rx_flush_reg[0] | uart_rx_flush_fsm;
   assign uart_rx_flush          = uart_rx_flush_fsm;
-  //assign uart_tx_flush          = uart_tx_flush_reg[0] | uart_tx_flush_fsm;
-  //assign uart_tx_flush          = uart_tx_flush_fsm;
   assign uart_tx_flush          = 1'b0;
   assign uart_rd                = 1'b0;
   assign uart_wr                = 1'b0;
@@ -337,7 +334,6 @@ module fec_top(
   logic                                 ul_fec_crc1_done;
   logic                                 ul_fec_crc1_valid;
   logic                                 ul_fec_uncor_err;
-   // logic                                 ul_mon_done;
   logic                                 ul_fsm_msg_done;
   logic                                 ul_mon_enc_used;
   logic                                 ul_mon_data_rd;
@@ -395,7 +391,6 @@ module fec_top(
     .ul_fec_enc_used  (ul_fec_enc_used),
     .ul_fec_done      (ul_fec_crc1_done),
     .ul_fec_uncor_err (ul_fec_uncor_err),
-    // .done             (ul_mon_done),
     .msg_done         (ul_fsm_msg_done),
     .enc_used         (ul_mon_enc_used),
     .data_rd          (ul_mon_data_rd),

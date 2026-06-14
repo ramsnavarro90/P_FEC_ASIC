@@ -62,7 +62,6 @@ logic [7:0]                     msg_len;
 logic [8:0]                     msg_cnt_p7;
 logic                           enc_used_i;
 logic                           uncor_err;
-// logic [2**UART_RX_FAW-2:0][UART_MDW-1:0] data_out;
 logic [UART_RX_WIDTH-1:0]       unscrambled_data_out;
 logic [CRC0_WIDTH-1:0]          crc_data_mux;
 logic [ENC0_DATA_DEPTH-1:0]     enc_row_p_mux;
@@ -128,14 +127,10 @@ always_comb begin
 
     S_MESSAGE_ID_REG: begin
       next_ul_state = S_MESSAGE_LEN_GET;
-      // if(fifo_cnt == 'd2)
-      //   next_ul_state = S_MESSAGE_LEN_GET;
-
     end
 
     S_MESSAGE_LEN_GET: begin
-      // We need to wait for UL FEC to be done
-      if(ul_fec_done)
+      if(ul_fec_done) // We need to wait for UL FEC to be done
         if(ul_fec_uncor_err)
           next_ul_state = S_IDLE;
         else
@@ -170,9 +165,7 @@ always_ff @(posedge clk or negedge rst_n) begin
     msg_cnt          <= 8'd0;
     deser_start      <= 1'b0;
     uncor_err        <= 1'b0;
-    // done             <= 1'b0;
     fifo_wr          <= 1'b0;
-    // fifo_cnt         <= 'b0;
   end
   else begin
     case(ul_state)
@@ -184,13 +177,10 @@ always_ff @(posedge clk or negedge rst_n) begin
         msg_cnt         <= 8'd0;
         deser_start     <= 1'b0;
         uncor_err       <= 1'b0;
-        // done            <= 1'b0;
         fifo_wr         <= 1'b0;
-        // fifo_cnt         <= 'b0;
       end
 
       S_TRAINING_START: begin
-        // done           <= 1'b0;
         fifo_wr   <= 1'b0;
         training_start <= 1'b1;
       end
@@ -205,31 +195,16 @@ always_ff @(posedge clk or negedge rst_n) begin
 
       S_MESSAGE_ID_SAMPLING: begin
         deser_start   <= 1'b0;
-        // if(deser_done)
-        //   done      <= 1'b1;
-        // else
-        //   done      <= 1'b0;
       end
 
       S_MESSAGE_ID_REG: begin
         fifo_wr   <= 1'b1;
         training_start <= 1'b1;
-        // fifo_cnt <= fifo_cnt + 1'b1;
-
-        // if(fifo_cnt == 'd0)
-        //   fifo_wr   <= 1'b1;
-        // else if(fifo_cnt == 'd1)
-        //   fifo_wr   <= 1'b0;
-        // else if(fifo_cnt == 'd2)
-        //   fifo_cnt <= 'b0;
-        // else
-        //   fifo_cnt <= fifo_cnt + 1'b1;
       end
 
       S_MESSAGE_LEN_GET: begin // Register Message ID and get Msg len
         fifo_wr   <= 1'b0;
         training_start <= 1'b0;
-        // done      <= 1'b0;
         
         // Extract msg_len after message id is decoded from UL FEC Engine
         if(ul_fec_done) begin
@@ -258,14 +233,12 @@ always_ff @(posedge clk or negedge rst_n) begin
 
       S_MESSAGE_DATA_START: begin
         deser_start   <= 1'b1;
-        //msg_cnt       <= msg_cnt + 8'd7;
         msg_cnt       <= (msg_cnt_p7>=msg_len)? msg_len:msg_cnt_p7;
       end
 
       S_MESSAGE_DATA_SAMPLING: begin
         deser_start  <= 1'b0;
         if(deser_done) begin
-          // done          <= 1'b1;
           if(msg_cnt >= msg_len) begin
             sampling      <= MESSAGE_ID;
             msg_cnt       <= 8'd0;
@@ -276,7 +249,6 @@ always_ff @(posedge clk or negedge rst_n) begin
           end
         end
         else begin
-          // done          <= 1'b0;
           sampling      <= sampling;
           msg_cnt       <= msg_cnt;
         end
@@ -379,8 +351,8 @@ fifo #(
   .rst_n          (rst_n),
   .rd             (fifo_rd),
   .wr             (fifo_wr),
-  .wdata          ({enc_used_i && msg_done,             // Encoder used for frame (Msg ID, Msg data)
-                    unscrambled_data_out, // Data from unscrambler
+  .wdata          ({enc_used_i && msg_done, // Encoder used for frame (Msg ID, Msg data)
+                    unscrambled_data_out,   // Data from unscrambler
                     crc_data_mux,
                     enc_row_p_mux,
                     enc_col_p_mux}),
