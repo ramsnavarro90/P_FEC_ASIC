@@ -213,7 +213,7 @@ always_ff @(posedge clk or negedge rst_n) begin
 
       S_MESSAGE_ID_REG: begin
         fifo_wr   <= 1'b1;
-
+        training_start <= 1'b1;
         // fifo_cnt <= fifo_cnt + 1'b1;
 
         // if(fifo_cnt == 'd0)
@@ -228,6 +228,7 @@ always_ff @(posedge clk or negedge rst_n) begin
 
       S_MESSAGE_LEN_GET: begin // Register Message ID and get Msg len
         fifo_wr   <= 1'b0;
+        training_start <= 1'b0;
         // done      <= 1'b0;
         
         // Extract msg_len after message id is decoded from UL FEC Engine
@@ -354,7 +355,6 @@ packet_unscramble #(
   .DATA_WIDTH       (SERIAL_DATA_WIDTH),
   .DATA_DEPTH       (SERIAL_DATA_DEPTH)
 ) ul_packet_unscramble_u (
-  // .enc_used        (ul_fec_enc_used),
   .enc_used        (enc_used_i && msg_done),
   .par_in          (deser_par_out),
   .data_out        (unscrambled_data_out),
@@ -367,7 +367,6 @@ packet_unscramble #(
 );
 
 // Data out FIFO
-//if(!ul_fec_enc_used || !msg_done)
 assign crc_data_mux  = (enc_used_i && msg_done)? {          {(CRC0_WIDTH-CRC1_WIDTH){1'b0}},crc1_data_i } :  crc0_data_i;
 assign enc_row_p_mux = (enc_used_i && msg_done)? {{(ENC0_DATA_DEPTH-ENC1_DATA_DEPTH){1'b0}},enc1_row_p_i} : enc0_row_p_i;
 assign enc_col_p_mux = (enc_used_i && msg_done)? {{(ENC0_DATA_WIDTH-ENC1_DATA_WIDTH){1'b0}},enc1_col_p_i} : enc0_col_p_i;
