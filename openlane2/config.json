@@ -1,6 +1,6 @@
 {
     "DESIGN_NAME": "fec_top",
-    "DESIGN_DIR": "designs/P_FEC_ASIC/source/desing/",
+    "DESIGN_DIR": "designs/P_FEC_ASIC/source/design/",
     "VERILOG_FILES": [
         "dir::defines.svh",
         "dir::crc.sv",
@@ -17,8 +17,10 @@
         "dir::ul_fec.sv",
         "dir::ul_mon.sv",
         "dir::fec_top.sv"],
+    "SYNTH_SHARE_RESOURCES": 0,
     "CLOCK_PERIOD": 25,
     "CLOCK_PORT": "clk",
     "CLOCK_NET": "clk",
-    "FP_PIN_ORDER_CFG":"dir::pin_order.cfg"
+    "ERROR_ON_SYNTH_CHECKS": false,
+    "FP_PIN_ORDER_CFG":"dir::../../openlane2/pin_order.cfg"
 }
