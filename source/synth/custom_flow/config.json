@@ -1,0 +1,26 @@
+{
+    "DESIGN_NAME": "fec_top",
+    "DESIGN_DIR": "designs/P_FEC_ASIC/source/desing",
+    "VERILOG_FILES": [
+        "dir::defines.svh",
+        "dir::crc.sv",
+        "dir::deser.sv",
+        "dir::ef_utils.v",
+        "dir::fec.sv",
+        "dir::fec_fsm.sv", 
+        "dir::reg_cfg.sv", 
+        "dir::packet.sv",
+        "dir::training.sv",
+        "dir::uart.sv",
+        "dir::dl_fec.sv",
+        "dir::dl_ctrl.sv",
+        "dir::ul_fec.sv",
+        "dir::ul_mon.sv",
+        "dir::fec_top.sv"],
+    "CLOCK_PERIOD": 25,
+    "CLOCK_PORT": "clk",
+    "CLOCK_NET": "clk",
+	"SYNTH_STRATEGY": "DELAY 1",
+	"ERROR_ON_SYNTH_CHECKS": false,
+    "IO_PIN_ORDER_CFG":"dir::../../librelane/pin_order.cfg"
+}
